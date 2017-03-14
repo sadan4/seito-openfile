@@ -2,7 +2,7 @@
     "name": "seito-openfile",
     "displayName": "seito-openfile",
     "description": "Extract a filepath from the current cursor position and open the file",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "publisher": "fr43nk",
     "engines": {
         "vscode": "^1.0.0"

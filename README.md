@@ -10,6 +10,11 @@ The bounds of a complete path string may not always work correct. In this versio
 
 ## Release Notes
 
+### 1.1.0
+
+- added functionality to use relative path related to the currently open file
+- ```~``` at the beginning of a path string indicates a home dir related path
+
 ### 1.0.0
 
 Initial release

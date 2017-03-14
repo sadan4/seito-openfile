@@ -3,6 +3,8 @@
 import * as vscode from 'vscode';
 import {dirname} from 'path';
 import {existsSync} from 'fs';
+import {TextOperations} from '../common/textoperations';
+import {FileOperations} from '../common/fileoperations';
 
 
 export class OpenFileFromText
@@ -34,9 +36,12 @@ export class OpenFileFromText
 	{
 		if( iWord === undefined || iWord === "" )
 			return;
-		if( existsSync(iWord) )
+
+		let p = FileOperations.getAbsoluteFromRelativePath(iWord, this.editor.document.fileName);
+
+		if( existsSync(p) )
 		{
-			vscode.workspace.openTextDocument(iWord).then((iDoc) => {
+			vscode.workspace.openTextDocument(p).then((iDoc) => {
 				if( iDoc !== undefined )
 				{
 					vscode.window.showTextDocument(iDoc).then((iEditor) => {
@@ -50,70 +55,20 @@ export class OpenFileFromText
 	public getWordRange(selection: vscode.Selection)
 	{
 		let line: string;
-		let start: number = 0;
+		let start: vscode.Position;
 		if( this.editor.selection.isEmpty )
 		{
-			line = this.getCurrentLine(selection.active.line);
-			start = selection.active.character;
+			line = TextOperations.getCurrentLine(this.editor.document.getText(),
+																					 selection.active.line);
+			start = selection.active;
 		}
 		else
 		{
-			line = this.getCurrentLine(selection.start.line);
-			start = selection.start.character;
+			line = TextOperations.getCurrentLine(this.editor.document.getText(),
+																					 selection.start.line);
+			start = selection.start;
 		}
-		let end = line.length;
-		let i = start;
-		let j = start;
-		for(; i>=0; i--)
-		{
-			let t = line[i];
-			if( t.match(/[\s\"\'\>\<#]/) !== null )
-			{
-				i++;
-				break;
-			}
-		}
-		for(; j<end; j++)
-		{
-			let t = line[j];
-			if( t.match(/[\s\"\'\>\<#]/) !== null )
-				break;
-		}
-		return line.substring(i,j);
+		return TextOperations.getWordBetweenBounds(line, start);
 	}
 
-	public getCurrentLine(iLine: number)
-	{
-		let raw = this.editor.document.getText();
-		let end = raw.length;
-		let start = 0;
-		let tmp = "";
-		let newLine = false;
-		let txt: string[] = [];
-		while(start<end)
-		{
-			if( raw[start] === '\n' || raw[start] === '\r' )
-			{
-				txt.push(tmp);
-				if( txt.length > iLine )
-					break;
-				tmp = "";
-				if( start+1 < end )
-				{
-					if( raw[start] === '\r' && raw[start+1] === '\n' )
-						start++;
-				}
-			}
-			else
-			{
-				tmp += raw[start];
-			}
-			start++;
-		}
-		if( txt && txt.length > iLine )
-		{
-			return txt[iLine];
-		}
-		return "";
-	}
 }
