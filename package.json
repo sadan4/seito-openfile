@@ -1,0 +1,49 @@
+{
+    "name": "seito-openfile",
+    "displayName": "seito-openfile",
+    "description": "Extract a filepath from the current cursor position and open the file",
+    "version": "0.0.1",
+    "publisher": "fr43nk",
+    "engines": {
+        "vscode": "^1.0.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "*"
+    ],
+    "main": "./out/src/extension",
+    "contributes": {
+        "commands": [{
+            "command": "seito-openfile.openFileFromText",
+            "category": "File",
+            "title": "Open file under cursor"
+        }],
+        "menus": {
+            "commandPalette": [
+                {
+                    "command": "seito-openfile.openFileFromText",
+                    "when": "seito-openfile:enabled"
+                }
+            ],
+            "editor/context": [
+                {
+                    "command": "seito-openfile.openFileFromText",
+                    "when": "editorTextFocus && seito-openfile:enabled",
+                    "group": "file"
+
+                }
+            ]
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
+        "compile": "node ./node_modules/vscode/bin/compile -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install"
+    },
+    "devDependencies": {
+        "typescript": "^1.8.5",
+        "vscode": "^0.11.0"
+    }
+}
