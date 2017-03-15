@@ -2,24 +2,34 @@
     "name": "seito-openfile",
     "displayName": "Open file",
     "description": "Extract a filepath from the current cursor position and open the file",
-    "version": "1.2.0",
-    "publisher": "fr43nk",
+    "version": "1.2.1",
+    "publisher": "Fr43nk",
     "engines": {
         "vscode": "^1.0.0"
     },
     "categories": [
         "Other"
     ],
+    "homepage": "https://github.com/fr43nk/seito-openfile/blob/master/README.md",
+    "bugs": {
+        "url": "https://github.com/fr43nk/seito-openfile/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/fr43nk/seito-openfile.git"
+    },
     "activationEvents": [
         "*"
     ],
     "main": "./out/src/extension",
     "contributes": {
-        "commands": [{
-            "command": "seito-openfile.openFileFromText",
-            "category": "File",
-            "title": "Open file under cursor"
-        }],
+        "commands": [
+            {
+                "command": "seito-openfile.openFileFromText",
+                "category": "File",
+                "title": "Open file under cursor"
+            }
+        ],
         "menus": {
             "commandPalette": [
                 {
@@ -32,7 +42,6 @@
                     "command": "seito-openfile.openFileFromText",
                     "when": "editorTextFocus && seito-openfile:enabled",
                     "group": "file"
-
                 }
             ]
         },
@@ -40,7 +49,7 @@
             "title": "Open file configurations",
             "properties": {
                 "seito-openfile.wordbound": {
-                    "type":"string",
+                    "type": "string",
                     "default": "[\\s\\\"\\'\\>\\<#]",
                     "description": "The RegExp to define the bound of the path string"
                 }
