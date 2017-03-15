@@ -29,35 +29,35 @@ suite("File operation Tests", () => {
 		let rel1 = "../../common/test.ts";
 		let curr1 = "d:\\Temp\\test\\";
 		let res = FileOperations.getAbsoluteFromRelativePath(rel1, curr1);
-		assert.equal("d:\\common\\test.ts", res);
+		assert.equal(res, "d:\\common\\test.ts");
 	});
 
 	test("RelToAbsPath 2", () => {
 		let rel1 = "../../../common/test.ts";
 		let curr1 = "d:\\Temp\\test\\";
 		let res = FileOperations.getAbsoluteFromRelativePath(rel1, curr1);
-		assert.equal("d:\\common\\test.ts", res);
+		assert.equal(res, "d:\\common\\test.ts");
 	});
 
 	test("RelToAbsPath 3", () => {
 		let rel1 = "";
 		let curr1 = "d:\\Temp\\test\\";
 		let res = FileOperations.getAbsoluteFromRelativePath(rel1, curr1);
-		assert.equal("", res);
+		assert.equal(res, "");
 	});
 
 	test("RelToAbsPath 4", () => {
 		let rel1;
 		let curr1 = "d:\\Temp\\test\\";
 		let res = FileOperations.getAbsoluteFromRelativePath(rel1, curr1);
-		assert.equal("", res);
+		assert.equal(res, "");
 	});
 
 	test("RelToAbsPath 5", () => {
 		let rel1 = "../../../common/test.ts";
 		let curr1 = "d:/Temp/test/";
 		let res = FileOperations.getAbsoluteFromRelativePath(rel1, curr1);
-		assert.equal("d:\\common\\test.ts", res);
+		assert.equal(res, "d:\\common\\test.ts");
 	});
 
 	test("RelToAbsPath 6", () => {
@@ -65,7 +65,7 @@ suite("File operation Tests", () => {
 		let rel1 = "~/common/test.ts";
 		let curr1 = "d:/Temp/test/";
 		let res = FileOperations.getAbsoluteFromRelativePath(rel1, curr1);
-		assert.equal(home + "\\common\\test.ts", res);
+		assert.equal(res, home + "\\common\\test.ts");
 	});
 
 	test("RelToAbsPath 7", () => {
@@ -73,14 +73,28 @@ suite("File operation Tests", () => {
 		let rel1 = "d:/common/test.ts";
 		let curr1 = "d:/Temp/test/";
 		let res = FileOperations.getAbsoluteFromRelativePath(rel1, curr1);
-		assert.equal("d:\\common\\test.ts", res);
+		assert.equal(res, "d:\\common\\test.ts");
 	});
 
 	test("RelToAbsPath 8", () => {
 		let rel1 = "../../common/test.ts";
 		let curr1 = "d:/Temp/test/hans.txt";
 		let res = FileOperations.getAbsoluteFromRelativePath(rel1, curr1);
-		assert.equal("d:\\common\\test.ts", res);
+		assert.equal(res, "d:\\common\\test.ts");
+	});
+
+	test("RelToAbsPath, current file does not exist", () => {
+		let rel1 = "../../common/test.ts";
+		let curr1 = "d:/Temp/test/hans.tx";
+		let res = FileOperations.getAbsoluteFromRelativePath(rel1, curr1);
+		assert.equal(res, "");
+	});
+
+	test("RelToAbsPath, text file does not exist", () => {
+		let rel1 = "../../common/test.ts1";
+		let curr1 = "d:/Temp/test/hans.txt";
+		let res = FileOperations.getAbsoluteFromRelativePath(rel1, curr1);
+		assert.equal(res, "d:\\common\\test.ts1");
 	});
 });
 

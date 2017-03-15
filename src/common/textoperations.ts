@@ -44,12 +44,11 @@ export class TextOperations
 
 	public static getWordBetweenBounds(iText: string, iPos:vscode.Position, iBounds?:RegExp): string
 	{
-		let bounds: RegExp = /[\s\"\'\>\<#]/;
+		let bounds: RegExp = new RegExp("[\\s\\\"\\\'\\>\\<#]");
 		if( iText === undefined || iText === "" )
 			return "";
 		if( iBounds !== undefined )
 			bounds = iBounds;
-		
 		let end = iText.length;
 		let i = iPos.character;
 		let j = iPos.character;
