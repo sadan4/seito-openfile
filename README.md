@@ -10,6 +10,10 @@ The bounds of a complete path string may not always work correct. In this versio
 
 ## Release Notes
 
+### 1.2.2
+
+- removed context menu from output window
+
 ### 1.2.1
 
 - added some project specific information into the package.json

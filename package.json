@@ -2,7 +2,7 @@
     "name": "seito-openfile",
     "displayName": "Open file",
     "description": "Extract a filepath from the current cursor position and open the file",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "publisher": "Fr43nk",
     "engines": {
         "vscode": "^1.0.0"
@@ -40,7 +40,7 @@
             "editor/context": [
                 {
                     "command": "seito-openfile.openFileFromText",
-                    "when": "editorTextFocus && seito-openfile:enabled",
+                    "when": "editorTextFocus && !inOutput && seito-openfile:enabled",
                     "group": "file"
                 }
             ]
