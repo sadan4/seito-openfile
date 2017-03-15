@@ -12,19 +12,26 @@ export class FileOperations
 		if( iPath === undefined || iPath === "" || iCurrPath === undefined || iCurrPath === "" )
 			return "";
 
-		if( iPath[0] === "~" )
+		try
 		{
-			iCurrPath = this.getAbsoluteHomePath();
-			iPath = iPath.substr(1);
-		}
-		else if( isAbsolute(iPath) )
-			return join(iPath);
-		else if( statSync(iCurrPath).isFile )
-		{
-			iCurrPath = dirname(iCurrPath);
-		}
+			if( iPath[0] === "~" )
+			{
+				iCurrPath = this.getAbsoluteHomePath();
+				iPath = iPath.substr(1);
+			}
+			else if( isAbsolute(iPath) )
+				return join(iPath);
+			else if( statSync(iCurrPath).isFile )
+			{
+				iCurrPath = dirname(iCurrPath);
+			}
 
-		return join(iCurrPath, iPath);
+			return join(iCurrPath, iPath);
+		}
+		catch(error)
+		{
+			return "";
+		}
 	}
 
 	public static getAbsoluteHomePath(): string

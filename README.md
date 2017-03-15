@@ -5,10 +5,18 @@ If the file is found by vscode then it will open a new tab with this file.
 
 ## Known Issues
 
-### 1.0.0
+### In 1.0.0
 The bounds of a complete path string may not always work correct. In this version only ```\s\<\>\"\'#``` are valid characters to limit the string. This will be a configuration feature of a future version.
 
 ## Release Notes
+
+### 1.2.0
+
+- added configuration of word bound for path string detection
+the default value is ```[\s\<\>\"\'#]``` and can be changed with the configuration parameter
+```
+seito-openfile.wordbound: "[\\s\\<\\>\\\"\\\'#]"
+```
 
 ### 1.1.0
 
@@ -17,4 +25,4 @@ The bounds of a complete path string may not always work correct. In this versio
 
 ### 1.0.0
 
-Initial release
+- Initial release

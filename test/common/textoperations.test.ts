@@ -12,6 +12,7 @@ import * as vscode from 'vscode';
 import {initialize, teardown} from '../initialize';
 import {writeFileSync, writeFile, unlink, unlinkSync, mkdirSync, rmdirSync} from 'fs';
 import {TextOperations} from '../../src/common/textoperations';
+import {ConfigHandler} from '../../src/configuration/confighandler';
 
 let dirname = "d:/temp/test";
 let filename = "d:/temp/test/testcase.txt";
@@ -56,6 +57,44 @@ suite("Text operation Tests", () => {
 		let pos = new vscode.Position(2, 7);
 		let res = TextOperations.getWordBetweenBounds('hi "welt"', pos)
 		assert.equal(res, "welt");
+	});
+
+	test("Get word, comment line", () => {
+		let pos = new vscode.Position(2, 6);
+		let res = TextOperations.getWordBetweenBounds('# hi/welt', pos)
+		assert.equal(res, "hi/welt");
+	});
+
+	test("Get word, <> bound", () => {
+		let pos = new vscode.Position(2, 6);
+		let res = TextOperations.getWordBetweenBounds(' <hi/welt>', pos)
+		assert.equal(res, "hi/welt");
+	});
+
+	test("Get word, '' bound", () => {
+		let pos = new vscode.Position(2, 6);
+		let res = TextOperations.getWordBetweenBounds(' \'hi/welt\'', pos)
+		assert.equal(res, "hi/welt");
+	});
+
+	test("Get word, \"\" bound", () => {
+		let pos = new vscode.Position(2, 6);
+		let res = TextOperations.getWordBetweenBounds(' "hi/welt"', pos)
+		assert.equal(res, "hi/welt");
+	});
+
+	test("Get word, \" bound, missing right \"", () => {
+		let pos = new vscode.Position(2, 6);
+		let res = TextOperations.getWordBetweenBounds(' "hi/welt  puh', pos)
+		assert.equal(res, "hi/welt");
+	});
+
+	test("Get word, right most position, with config", () => {
+		let configHandler = new ConfigHandler();
+		configHandler.Configuration.Bound = /\:/;
+		let pos = new vscode.Position(2, 7);
+		let res = TextOperations.getWordBetweenBounds('hi ":welt da:"', pos, configHandler.Configuration.Bound)
+		assert.equal(res, "welt da");
 	});
 
 });

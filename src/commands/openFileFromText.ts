@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import {dirname} from 'path';
 import {existsSync} from 'fs';
+import {ConfigHandler} from '../configuration/confighandler';
 import {TextOperations} from '../common/textoperations';
 import {FileOperations} from '../common/fileoperations';
 
@@ -11,7 +12,8 @@ export class OpenFileFromText
 {
 	private m_currFile: vscode.Uri;
 
-	public constructor(private editor: vscode.TextEditor)
+	public constructor(private editor: vscode.TextEditor,
+										 private configHandler: ConfigHandler)
 	{
 		if( editor.document &&
 				editor.document.uri )
@@ -68,7 +70,7 @@ export class OpenFileFromText
 																					 selection.start.line);
 			start = selection.start;
 		}
-		return TextOperations.getWordBetweenBounds(line, start);
+		return TextOperations.getWordBetweenBounds(line, start, this.configHandler.Configuration.Bound);
 	}
 
 }
