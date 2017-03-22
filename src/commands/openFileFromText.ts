@@ -15,7 +15,8 @@ export class OpenFileFromText
 	public constructor(private editor: vscode.TextEditor,
 										 private configHandler: ConfigHandler)
 	{
-		if( editor.document &&
+		if( editor &&
+				editor.document &&
 				editor.document.uri )
 		{
 			this.m_currFile = editor.document.uri;
