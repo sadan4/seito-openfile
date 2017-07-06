@@ -1,5 +1,9 @@
 ## Release Notes
 
+### 1.3.3
+
+- updated readme.
+
 ### 1.3.2
 
 - Fix: could not open file if string is last line of editor text (thanks to @beatscode)
