@@ -41,14 +41,24 @@ export class OpenFileFromText
 			return;
 
 		let p = FileOperations.getAbsoluteFromRelativePath(iWord, this.editor.document.fileName);
+		let lineNumber = 0;
+		let filepath = p;
+		//Check for :filenumber
+		if (p.indexOf(":") > -1) {
+			let parts = p.split(":");
+			filepath = parts[0];
+			lineNumber = parseInt(parts[1]);
+		}
 
-		if( existsSync(p) )
-		{
-			vscode.workspace.openTextDocument(p).then((iDoc) => {
-				if( iDoc !== undefined )
-				{
+		if (existsSync(filepath)) {
+			vscode.workspace.openTextDocument(filepath).then((iDoc) => {
+				if (iDoc !== undefined) {
 					vscode.window.showTextDocument(iDoc).then((iEditor) => {
-
+						if (lineNumber) {
+							let range = this.editor.document.lineAt(lineNumber - 1).range;
+							this.editor.selection = new vscode.Selection(range.start, range.end);
+							this.editor.revealRange(range, vscode.TextEditorRevealType.InCenter);
+						}
 					});
 				}
 			});
