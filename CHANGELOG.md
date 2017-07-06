@@ -1,5 +1,9 @@
 ## Release Notes
 
+### 1.3.4
+
+- fixed windows absolute path and line number
+
 ### 1.3.3
 
 - updated readme.

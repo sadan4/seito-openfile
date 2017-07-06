@@ -97,4 +97,23 @@ suite("Text operation Tests", () => {
 		assert.equal(res, "welt da");
 	});
 
+	test("Get path and line number, \"windows absolute path string\"", () => {
+		let res = TextOperations.getPathAndLineNumber("l:\\Datas\\Test.txt");
+		assert.equal(res.file, "l:\\Datas\\Test.txt");
+		assert.equal(res.line, "-1");
+	});
+
+	test("Get path and line number, \"windows absolute path string and tailing colon\"", () => {
+		let res = TextOperations.getPathAndLineNumber("l:\\Datas\\Test.txt:");
+		assert.equal(res.file, "l:\\Datas\\Test.txt");
+		assert.equal(res.line, "-1");
+	});
+
+	test("Get path and line number, \"windows absolute path string and tailing colon and number\"", () => {
+		let res = TextOperations.getPathAndLineNumber("l:\\Datas\\Test.txt:42");
+		assert.equal(res.file, "l:\\Datas\\Test.txt");
+		assert.equal(res.line, "42");
+	});
+
+
 });

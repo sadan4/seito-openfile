@@ -51,10 +51,15 @@ export class TextOperations
 			line: -1
 		};
 		
-		if (fileAndLine.file.indexOf(":") > -1) {
-			const parts = fileAndLine.file.split(":");
-			fileAndLine.file = parts[0];
-			fileAndLine.line = parseInt(parts[1]);
+		if (fileAndLine.file.lastIndexOf(":") > -1) {
+			const lPos = iWord.lastIndexOf(":");
+			fileAndLine.file = iWord.substring(0, lPos);
+			fileAndLine.line = parseInt(iWord.substring(lPos+1));
+			if( isNaN(fileAndLine.line) )
+			{
+				fileAndLine.file = (iWord.length === lPos+1 ? iWord.substring(0,lPos) : iWord);
+				fileAndLine.line = -1;
+			}
 		}
 		return fileAndLine;
 	}

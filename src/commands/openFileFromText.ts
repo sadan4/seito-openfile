@@ -47,7 +47,7 @@ export class OpenFileFromText
 			vscode.workspace.openTextDocument(fileAndLine.file).then((iDoc) => {
 				if (iDoc !== undefined) {
 					vscode.window.showTextDocument(iDoc).then((iEditor) => {
-						if (fileAndLine.line) {
+						if (fileAndLine.line !== -1) {
 							let range = iEditor.document.lineAt(fileAndLine.line - 1).range;
 							iEditor.selection = new vscode.Selection(range.start, range.end);
 							iEditor.revealRange(range, vscode.TextEditorRevealType.InCenter);
