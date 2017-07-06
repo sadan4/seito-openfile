@@ -15,7 +15,7 @@ export class TextOperations
 		let tmp = "";
 		let newLine = false;
 		let txt: string[] = [];
-		while(start<end)
+		while(start<=end)
 		{
 			if( raw[start] === '\n' || raw[start] === '\r' )
 			{
@@ -28,6 +28,9 @@ export class TextOperations
 					if( raw[start] === '\r' && raw[start+1] === '\n' )
 						start++;
 				}
+			}
+			else if(start == end){
+				txt.push(tmp)
 			}
 			else
 			{
