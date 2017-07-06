@@ -1,5 +1,9 @@
 ## Release Notes
 
+### 1.3.1
+
+- added ability to read string with line number and open it at that line (thanks to @beatscode)
+
 ### 1.2.5
 
 - added CHANGELOG.md file for better documentation
