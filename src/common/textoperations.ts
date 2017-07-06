@@ -41,7 +41,20 @@ export class TextOperations
 		}
 		return "";
 	}
-
+	public static getPathAndLineNumber(iWord:string): any
+	{
+		let fileAndLine = {
+			file: iWord,
+			line: -1
+		};
+		
+		if (fileAndLine.file.indexOf(":") > -1) {
+			const parts = fileAndLine.file.split(":");
+			fileAndLine.file = parts[0];
+			fileAndLine.line = parseInt(parts[1]);
+		}
+		return fileAndLine;
+	}
 	public static getWordBetweenBounds(iText: string, iPos:vscode.Position, iBounds?:RegExp): string
 	{
 		let bounds: RegExp = new RegExp("[\\s\\\"\\\'\\>\\<#]");
