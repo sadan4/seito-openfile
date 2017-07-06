@@ -1,5 +1,9 @@
 ## Release Notes
 
+### 1.3.2
+
+- Fix: could not open file if string is last line of editor text (thanks to @beatscode)
+
 ### 1.3.1
 
 - added ability to read string with line number and open it at that line (thanks to @beatscode)
