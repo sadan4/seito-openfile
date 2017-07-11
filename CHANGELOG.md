@@ -1,5 +1,10 @@
 ## Release Notes
 
+### 1.4.0
+
+- open the string that is selected in the document
+- you can now open multiple selections at once
+
 ### 1.3.4
 
 - fixed windows absolute path and line number

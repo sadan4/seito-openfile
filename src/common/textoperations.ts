@@ -44,6 +44,7 @@ export class TextOperations
 		}
 		return "";
 	}
+
 	public static getPathAndLineNumber(iWord:string): any
 	{
 		let fileAndLine = {
@@ -92,6 +93,15 @@ export class TextOperations
 				break;
 		}
 		return iText.substring(i,j);
+
+	}
+	
+	public static getWordOfSelection(iText: string, iSelection:vscode.Selection): string
+	{
+		let bounds: RegExp = new RegExp("[\\s\\\"\\\'\\>\\<#]");
+		if( iText === undefined || iText === "" )
+			return "";
+		return iText.substring(iSelection.start.character,iSelection.end.character);
 
 	}
 }

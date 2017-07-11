@@ -83,6 +83,13 @@ suite("File operation Tests", () => {
 		assert.equal(res, "d:\\common\\test.ts");
 	});
 
+	test("RelToAbsPath 9", () => {
+		let rel1 = "..\\common\\test.ts";
+		let curr1 = "d:/Temp/test/hans.txt";
+		let res = FileOperations.getAbsoluteFromRelativePath(rel1, curr1);
+		assert.equal(res, "d:\\Temp\\common\\test.ts");
+	});
+
 	test("RelToAbsPath, current file does not exist", () => {
 		let rel1 = "../../common/test.ts";
 		let curr1 = "d:/Temp/test/hans.tx";

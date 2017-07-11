@@ -89,6 +89,12 @@ suite("Text operation Tests", () => {
 		assert.equal(res, "hi/welt");
 	});
 
+	test("Get word, \" bound, leading .. ", () => {
+		let pos = new vscode.Position(2, 16);
+		let res = TextOperations.getWordBetweenBounds('ein Text davor "..\\hi\\datei.txt" und dann noch was danach', pos)
+		assert.equal(res, "..\\hi\\datei.txt");
+	});
+
 	test("Get word, right most position, with config", () => {
 		let configHandler = new ConfigHandler();
 		configHandler.Configuration.Bound = /\:/;

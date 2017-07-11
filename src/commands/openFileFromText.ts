@@ -30,9 +30,12 @@ export class OpenFileFromText
 
 	public execute()
 	{
-		let word = this.getWordRange(this.editor.selection);
-		this.openDocument(word);
-		console.log("Execute command", word);
+		for(let i:number=0; i<this.editor.selections.length; i++)
+		{
+			let word = this.getWordRange(this.editor.selections[i]);
+			this.openDocument(word);
+			console.log("Execute command", word);
+		}
 	}
 
 	public openDocument(iWord:string)
@@ -72,7 +75,7 @@ export class OpenFileFromText
 		{
 			line = TextOperations.getCurrentLine(this.editor.document.getText(),
 																					 selection.start.line);
-			start = selection.start;
+			return TextOperations.getWordOfSelection(line, selection);
 		}
 		return TextOperations.getWordBetweenBounds(line, start, this.configHandler.Configuration.Bound);
 	}
