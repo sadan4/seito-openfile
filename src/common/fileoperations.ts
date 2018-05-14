@@ -34,6 +34,29 @@ export class FileOperations
 		}
 	}
 
+	public static getAbsolutePathFromFuzzyPath(iPath:string, iCurrPath:string): string
+	{
+		if( iPath === undefined || iPath === "" || iCurrPath === undefined || iCurrPath === "" )
+			return "";
+		// extract file name
+		let rightPos = iPath.lastIndexOf("/");
+		if( rightPos === -1 )
+			rightPos = iPath.lastIndexOf("\\");
+		if( rightPos > -1 && rightPos < (iPath.length-1))
+		{
+			let suffix = "scss";
+			let fileName = iPath.substr(rightPos+1);
+			if( fileName.indexOf("_") == -1 || fileName.indexOf("_") > 0 )
+				fileName = "_" + fileName;
+			if( fileName.lastIndexOf(".") == -1 )
+				fileName += ".scss";
+			let path = iPath.substr(0, rightPos+1);
+			path += fileName;
+			return this.getAbsoluteFromRelativePath(path, iCurrPath);
+		}
+		return "";
+	}
+
 	public static getAbsoluteHomePath(): string
 	{
 		let prof = (process.platform === 'win32') ? 'USERPROFILE' : 'HOME';

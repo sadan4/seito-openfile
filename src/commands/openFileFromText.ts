@@ -44,7 +44,9 @@ export class OpenFileFromText
 			return;
 
 		let p = FileOperations.getAbsoluteFromRelativePath(iWord, this.editor.document.fileName);
-		let fileAndLine = TextOperations.getPathAndLineNumber(p)
+		if( !existsSync(p) )
+			p = FileOperations.getAbsolutePathFromFuzzyPath(iWord, this.editor.document.fileName);
+		let fileAndLine = TextOperations.getPathAndLineNumber(p);
 
 		if (existsSync(fileAndLine.file)) {
 			vscode.workspace.openTextDocument(fileAndLine.file).then((iDoc) => {

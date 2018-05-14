@@ -103,5 +103,30 @@ suite("File operation Tests", () => {
 		let res = FileOperations.getAbsoluteFromRelativePath(rel1, curr1);
 		assert.equal(res, "d:\\common\\test.ts1");
 	});
+
+	test("FuzzyPath, file has leading underscore (scss) and suffix but not in file", () => {
+		let rel1 = "./test2";
+		let curr1 = "d:/Temp/test/test.scss";
+		let res = FileOperations.getAbsolutePathFromFuzzyPath(rel1, curr1);
+		assert.equal(res, "d:\\Temp\\test\\_test2.scss");
+	});
+	test("FuzzyPath, file has leading underscore (scss) and suffix but only suffix in file", () => {
+		let rel1 = "./test3.scss";
+		let curr1 = "d:/Temp/test/test.scss";
+		let res = FileOperations.getAbsolutePathFromFuzzyPath(rel1, curr1);
+		assert.equal(res, "d:\\Temp\\test\\_test3.scss");
+	});
+	test("FuzzyPath, file has leading underscore (scss) and suffix but only suffix in file, relative path", () => {
+		let rel1 = "../../Temp/test/test3";
+		let curr1 = "d:/Temp/test/test.scss";
+		let res = FileOperations.getAbsolutePathFromFuzzyPath(rel1, curr1);
+		assert.equal(res, "d:\\Temp\\test\\_test3.scss");
+	});
+	test("FuzzyPath, file has leading underscore (scss) and suffix but only underscore, relative path", () => {
+		let rel1 = "../../Temp/test/_test3";
+		let curr1 = "d:/Temp/test/test.scss";
+		let res = FileOperations.getAbsolutePathFromFuzzyPath(rel1, curr1);
+		assert.equal(res, "d:\\Temp\\test\\_test3.scss");
+	});
 });
 

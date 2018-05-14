@@ -1,5 +1,13 @@
 ## Release Notes
 
+### 1.5.0
+
+- open files in scss files written in shortened way
+```
+@import "folder/style"
+```
+Where the file ```style``` exists on filesystem with the name ```_style.scss``` (thanks to @dutchwebworks)
+
 ### 1.4.0
 
 - open the string that is selected in the document
