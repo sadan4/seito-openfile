@@ -43,13 +43,13 @@ export class OpenFileFromText
 		if( iWord === undefined || iWord === "" )
 			return;
 
-		let p = FileOperations.getAbsoluteFromRelativePath(iWord, this.editor.document.fileName);
+		let fileAndLine = TextOperations.getPathAndLineNumber(iWord);
+		let p = FileOperations.getAbsoluteFromRelativePath(fileAndLine.file, this.editor.document.fileName);
 		if( !existsSync(p) )
-			p = FileOperations.getAbsolutePathFromFuzzyPath(iWord, this.editor.document.fileName);
-		let fileAndLine = TextOperations.getPathAndLineNumber(p);
+			p = FileOperations.getAbsolutePathFromFuzzyPath(fileAndLine.file, this.editor.document.fileName);
 
-		if (existsSync(fileAndLine.file)) {
-			vscode.workspace.openTextDocument(fileAndLine.file).then((iDoc) => {
+		if (existsSync(p)) {
+			vscode.workspace.openTextDocument(p).then((iDoc) => {
 				if (iDoc !== undefined) {
 					vscode.window.showTextDocument(iDoc).then((iEditor) => {
 						if (fileAndLine.line !== -1) {

@@ -10,8 +10,10 @@ import * as assert from 'assert';
 // as well as import your extension to test it
 import * as vscode from 'vscode';
 import {initialize, teardown} from '../initialize';
-import {writeFileSync, writeFile, unlink, unlinkSync, mkdirSync} from 'fs';
+import {writeFileSync, writeFile, unlink, unlinkSync, mkdirSync, open} from 'fs';
 import {FileOperations} from '../../src/common/fileoperations';
+import { OpenFileFromText } from '../../src/commands/openFileFromText';
+import { ConfigHandler } from '../../src/configuration/confighandler';
 
 // Defines a Mocha test suite to group tests of similar kind together
 
@@ -127,6 +129,13 @@ suite("File operation Tests", () => {
 		let curr1 = "d:/Temp/test/test.scss";
 		let res = FileOperations.getAbsolutePathFromFuzzyPath(rel1, curr1);
 		assert.equal(res, "d:\\Temp\\test\\_test3.scss");
+	});
+	test("Github #6: Open with line number", () => {
+		let configHandler: ConfigHandler = new ConfigHandler();
+		let openFile: OpenFileFromText = new OpenFileFromText(
+				vscode.window.activeTextEditor, configHandler);
+		openFile.openDocument("d:/temp/test/testcase.txt:2");
+		assert.equal(vscode.window.activeTextEditor.document.fileName,"d:/temp/test/testcase.txt");
 	});
 });
 
