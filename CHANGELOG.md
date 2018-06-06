@@ -1,5 +1,9 @@
 ## Release Notes
 
+### 1.5.1
+
+- fixed the broken open file at line functionality (thanks to @stephanedr)
+
 ### 1.5.0
 
 - open files in scss files written in shortened way
