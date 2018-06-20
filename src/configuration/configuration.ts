@@ -5,12 +5,12 @@ import * as vscode from 'vscode';
 export class Configuration
 {
 	private m_bound: RegExp;
-	private m_suffixes: Array<string>;
+	private m_extensions: Array<string>;
 
 	public constructor()
 	{
 		this.m_bound = new RegExp("[\\s\\\"\\\'\\>\\<#]");
-		this.m_suffixes = new Array<string>();
+		this.m_extensions = new Array<string>();
 	}
 
 	get Bound(): RegExp
@@ -34,16 +34,16 @@ export class Configuration
 		}
 	}
 
-	set Suffixes(iSufx: Array<string>)
+	set Extensions(iSufx: Array<string>)
 	{
 		if( iSufx !== undefined )
 		{
-			this.m_suffixes = iSufx;
+			this.m_extensions = iSufx;
 		}
 	}
 
-	get Suffixes(): Array<string>
+	get Extensions(): Array<string>
 	{
-		return this.m_suffixes;
+		return this.m_extensions;
 	}
 }

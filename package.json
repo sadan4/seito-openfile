@@ -53,7 +53,7 @@
                     "default": "[\\s\\\"\\'\\>\\<#]",
                     "description": "The RegExp to define the bound of the path string"
                 },
-                "seito-openfile.suffixes": {
+                "seito-openfile.extensions": {
                     "type": "array",
                     "default": ["scss", "js", "jsx"],
                     "description": "Known suffixes to look for when file string has no suffix"

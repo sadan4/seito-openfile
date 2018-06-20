@@ -1,5 +1,16 @@
 ## Release Notes
 
+### 1.6.0
+
+- added a configuration for file extensions (thanks to @jackfranklin)
+```
+seito-openfile.extensions: ["scss", "jsx", "js]
+```
+  So you are able to open a file that has no extension written in the text like a scss import
+```
+@import "folder/style"
+```
+
 ### 1.5.1
 
 - fixed the broken open file at line functionality (thanks to @stephanedr)

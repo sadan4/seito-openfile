@@ -40,9 +40,9 @@ export class OpenFileFromText {
 			let fileAndLine = TextOperations.getPathAndLineNumber(iWord);
 			let p = FileOperations.getAbsoluteFromRelativePath(fileAndLine.file, this.editor.document.fileName);
 			if (!existsSync(p)) {
-				let suffixes = ConfigHandler.Instance.Configuration.Suffixes;
-				for (let suffix of suffixes) {
-					p = FileOperations.getAbsolutePathFromFuzzyPath(fileAndLine.file, this.editor.document.fileName, suffix);
+				let extensions = ConfigHandler.Instance.Configuration.Extensions;
+				for (let extension of extensions) {
+					p = FileOperations.getAbsolutePathFromFuzzyPath(fileAndLine.file, this.editor.document.fileName, extension);
 					if (p != "") {
 						break;
 					}

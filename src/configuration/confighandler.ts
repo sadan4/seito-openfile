@@ -36,9 +36,9 @@ export class ConfigHandler
 				let r = new RegExp(config.get("wordbound") as string);
 				this.m_configuration.Bound = r;
 			}
-			if( config.has("suffixes") === true )
+			if( config.has("extensions") === true )
 			{
-				this.m_configuration.Suffixes = config.get("suffixes") as string[];
+				this.m_configuration.Extensions = config.get("extensions") as string[];
 			}
 		}
 	}
