@@ -2,7 +2,7 @@
     "name": "seito-openfile",
     "displayName": "Open file",
     "description": "Extract a filepath from the current cursor position and open the file",
-    "version": "1.5.1",
+    "version": "1.6.0",
     "publisher": "Fr43nk",
     "engines": {
         "vscode": "^1.0.0"
@@ -55,7 +55,11 @@
                 },
                 "seito-openfile.extensions": {
                     "type": "array",
-                    "default": ["scss", "js", "jsx"],
+                    "default": [
+                        "scss",
+                        "js",
+                        "jsx"
+                    ],
                     "description": "Known suffixes to look for when file string has no suffix"
                 }
             }
