@@ -12,7 +12,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.executeCommand("setContext", "seito-openfile:enabled", true);
 
     console.log("seito-openfile extension started");
-    let configHandler: ConfigHandler = new ConfigHandler();
+    let configHandler: ConfigHandler = ConfigHandler.Instance;
     let openFile: OpenFileFromText = new OpenFileFromText(
         vscode.window.activeTextEditor, configHandler);
 

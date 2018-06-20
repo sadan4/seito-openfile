@@ -21,14 +21,10 @@ let content = "the first line\r\nthe second line\r\n\r\nthe forth line\r\n\r\nth
 suite("Text operation Tests", () => {
 
 	suiteSetup((done) => {
-		mkdirSync(dirname);
-		writeFileSync(filename, content);
-		done();
+		initialize().then(done, done);
 	});
 	suiteTeardown((done) => {
-		unlinkSync(filename);
-		rmdirSync(dirname);
-		done();
+		teardown().then(done, done);
 	});
 
 	test("Read second line", () => {
@@ -96,7 +92,7 @@ suite("Text operation Tests", () => {
 	});
 
 	test("Get word, right most position, with config", () => {
-		let configHandler = new ConfigHandler();
+		let configHandler = ConfigHandler.Instance;
 		configHandler.Configuration.Bound = /\:/;
 		let pos = new vscode.Position(2, 7);
 		let res = TextOperations.getWordBetweenBounds('hi ":welt da:"', pos, configHandler.Configuration.Bound)

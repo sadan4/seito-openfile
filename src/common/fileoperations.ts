@@ -3,6 +3,8 @@
 import * as vscode from 'vscode';
 import {dirname,join,isAbsolute} from 'path';
 import {existsSync,statSync} from 'fs';
+import { ConfigHandler } from '../configuration/confighandler';
+import { Configuration } from '../configuration/configuration';
 
 
 export class FileOperations
@@ -34,7 +36,7 @@ export class FileOperations
 		}
 	}
 
-	public static getAbsolutePathFromFuzzyPath(iPath:string, iCurrPath:string): string
+	public static getAbsolutePathFromFuzzyPath(iPath:string, iCurrPath:string, iSuffix): string
 	{
 		if( iPath === undefined || iPath === "" || iCurrPath === undefined || iCurrPath === "" )
 			return "";
@@ -42,18 +44,37 @@ export class FileOperations
 		let rightPos = iPath.lastIndexOf("/");
 		if( rightPos === -1 )
 			rightPos = iPath.lastIndexOf("\\");
+		let fileName = iPath;
+		let path = "./";
 		if( rightPos > -1 && rightPos < (iPath.length-1))
 		{
-			let suffix = "scss";
-			let fileName = iPath.substr(rightPos+1);
-			if( fileName.indexOf("_") == -1 || fileName.indexOf("_") > 0 )
-				fileName = "_" + fileName;
-			if( fileName.lastIndexOf(".") == -1 )
-				fileName += ".scss";
-			let path = iPath.substr(0, rightPos+1);
-			path += fileName;
-			return this.getAbsoluteFromRelativePath(path, iCurrPath);
+			fileName = iPath.substr(rightPos+1);
+			path = iPath.substr(0, rightPos+1);
 		}
+		let retVal = "";
+		let f = fileName;
+		let p = path;
+		if( fileName.lastIndexOf(".") == -1 )
+		{
+			f += "." + iSuffix;
+			p += f;
+		}
+		else
+		{
+			p += f;
+		}
+		retVal = this.getAbsoluteFromRelativePath(p, iCurrPath);
+		if(!existsSync(retVal))
+		{
+			if( fileName.indexOf("_") == -1 || fileName.indexOf("_") > 0 )
+			{
+				f = "_" + f;
+				p = path + f;
+				retVal = this.getAbsoluteFromRelativePath(p, iCurrPath);
+			}
+		}
+		if(existsSync(retVal))
+			return retVal;
 		return "";
 	}
 

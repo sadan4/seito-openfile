@@ -1,6 +1,7 @@
 'use strict';
 
 import * as vscode from 'vscode';
+import { ConfigHandler } from '../configuration/confighandler';
 
 export class TextOperations
 {
@@ -66,7 +67,7 @@ export class TextOperations
 	}
 	public static getWordBetweenBounds(iText: string, iPos:vscode.Position, iBounds?:RegExp): string
 	{
-		let bounds: RegExp = new RegExp("[\\s\\\"\\\'\\>\\<#]");
+		let bounds: RegExp = ConfigHandler.Instance.Configuration.Bound;
 		if( iText === undefined || iText === "" )
 			return "";
 		if( iBounds !== undefined )
@@ -98,7 +99,7 @@ export class TextOperations
 	
 	public static getWordOfSelection(iText: string, iSelection:vscode.Selection): string
 	{
-		let bounds: RegExp = new RegExp("[\\s\\\"\\\'\\>\\<#]");
+		let bounds: RegExp = ConfigHandler.Instance.Configuration.Bound;
 		if( iText === undefined || iText === "" )
 			return "";
 		return iText.substring(iSelection.start.character,iSelection.end.character);

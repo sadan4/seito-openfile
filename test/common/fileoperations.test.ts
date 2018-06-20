@@ -10,13 +10,15 @@ import * as assert from 'assert';
 // as well as import your extension to test it
 import * as vscode from 'vscode';
 import {initialize, teardown} from '../initialize';
-import {writeFileSync, writeFile, unlink, unlinkSync, mkdirSync, open} from 'fs';
+import {writeFileSync, writeFile, unlink, unlinkSync, mkdirSync, open, rmdirSync, existsSync} from 'fs';
 import {FileOperations} from '../../src/common/fileoperations';
 import { OpenFileFromText } from '../../src/commands/openFileFromText';
 import { ConfigHandler } from '../../src/configuration/confighandler';
 
 // Defines a Mocha test suite to group tests of similar kind together
-
+let dirname = "d:/temp/test";
+let filename = "d:/temp/test/testcase.txt";
+let content = "the first line\r\nthe second line\r\n\r\nthe forth line\r\n\r\nthe sixth line";
 
 suite("File operation Tests", () => {
 
@@ -109,33 +111,39 @@ suite("File operation Tests", () => {
 	test("FuzzyPath, file has leading underscore (scss) and suffix but not in file", () => {
 		let rel1 = "./test2";
 		let curr1 = "d:/Temp/test/test.scss";
-		let res = FileOperations.getAbsolutePathFromFuzzyPath(rel1, curr1);
+		let res = FileOperations.getAbsolutePathFromFuzzyPath(rel1, curr1, "scss");
 		assert.equal(res, "d:\\Temp\\test\\_test2.scss");
 	});
 	test("FuzzyPath, file has leading underscore (scss) and suffix but only suffix in file", () => {
 		let rel1 = "./test3.scss";
 		let curr1 = "d:/Temp/test/test.scss";
-		let res = FileOperations.getAbsolutePathFromFuzzyPath(rel1, curr1);
+		let res = FileOperations.getAbsolutePathFromFuzzyPath(rel1, curr1, "scss");
 		assert.equal(res, "d:\\Temp\\test\\_test3.scss");
 	});
 	test("FuzzyPath, file has leading underscore (scss) and suffix but only suffix in file, relative path", () => {
 		let rel1 = "../../Temp/test/test3";
 		let curr1 = "d:/Temp/test/test.scss";
-		let res = FileOperations.getAbsolutePathFromFuzzyPath(rel1, curr1);
+		let res = FileOperations.getAbsolutePathFromFuzzyPath(rel1, curr1, "scss");
 		assert.equal(res, "d:\\Temp\\test\\_test3.scss");
 	});
 	test("FuzzyPath, file has leading underscore (scss) and suffix but only underscore, relative path", () => {
 		let rel1 = "../../Temp/test/_test3";
 		let curr1 = "d:/Temp/test/test.scss";
-		let res = FileOperations.getAbsolutePathFromFuzzyPath(rel1, curr1);
+		let res = FileOperations.getAbsolutePathFromFuzzyPath(rel1, curr1, "scss");
 		assert.equal(res, "d:\\Temp\\test\\_test3.scss");
 	});
-	test("Github #6: Open with line number", () => {
-		let configHandler: ConfigHandler = new ConfigHandler();
+	test("Github #6: Open with line number", (done) => {
+		let configHandler: ConfigHandler = ConfigHandler.Instance;
 		let openFile: OpenFileFromText = new OpenFileFromText(
 				vscode.window.activeTextEditor, configHandler);
-		openFile.openDocument("d:/temp/test/testcase.txt:2");
-		assert.equal(vscode.window.activeTextEditor.document.fileName,"d:/temp/test/testcase.txt");
+		openFile.openDocument("d:/Temp/test/testcase.txt:2").then(value => {
+			assert.equal(vscode.window.activeTextEditor.document.fileName,"d:\\Temp\\test\\testcase.txt");
+			console.log(value);
+			done();
+		}).catch(value => {
+			console.log(value);
+			done(value);
+		});
 	});
 });
 
