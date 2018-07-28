@@ -38,11 +38,12 @@ export class OpenFileFromText {
 				reject("Something went wrong");
 
 			let fileAndLine = TextOperations.getPathAndLineNumber(iWord);
-			let p = FileOperations.getAbsoluteFromRelativePath(fileAndLine.file, this.editor.document.fileName);
+			let currentDocFileName = this.editor ? this.editor.document.fileName : '';
+			let p = FileOperations.getAbsoluteFromRelativePath(fileAndLine.file, currentDocFileName);
 			if (!existsSync(p)) {
 				let extensions = ConfigHandler.Instance.Configuration.Extensions;
 				for (let extension of extensions) {
-					p = FileOperations.getAbsolutePathFromFuzzyPath(fileAndLine.file, this.editor.document.fileName, extension);
+					p = FileOperations.getAbsolutePathFromFuzzyPath(fileAndLine.file, currentDocFileName, extension);
 					if (p != "") {
 						break;
 					}

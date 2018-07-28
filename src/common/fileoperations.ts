@@ -11,7 +11,7 @@ export class FileOperations
 {
 	public static getAbsoluteFromRelativePath(iPath:string, iCurrPath:string): string
 	{
-		if( iPath === undefined || iPath === "" || iCurrPath === undefined || iCurrPath === "" )
+		if( iPath === undefined || iPath === "" || iCurrPath === undefined )
 			return "";
 
 		try
@@ -23,6 +23,8 @@ export class FileOperations
 			}
 			else if( isAbsolute(iPath) )
 				return join(iPath);
+			else if( iCurrPath === "" ) // fault tolerant: only fail when not absolute or relative-to-home path, if iCurrPath is blank (fix some test case when activeTextEditor is null)
+				return "";
 			else if( statSync(iCurrPath).isFile )
 			{
 				iCurrPath = dirname(iCurrPath);
