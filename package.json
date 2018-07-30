@@ -55,12 +55,26 @@
                 },
                 "seito-openfile.extensions": {
                     "type": "array",
-                    "default": [
-                        "scss",
-                        "js",
-                        "jsx"
-                    ],
-                    "description": "Known suffixes to look for when file string has no suffix"
+                    "default": [],
+                    "description": "Known suffixes to look for when file string has no suffix (Deprecated. Default to search with current document's suffix if path in text has no extension)"
+                },
+                "seito-openfile.extraExtensionsForTypes": {
+                    "type": "object",
+                    "default": {
+                        "js": ["jsx"],
+                        "jsx": ["js"]
+                    },
+                    "description": "Known suffixes to look for when file string has no suffix, according to current document's type. (suffix match is relative to current document's parent folders only)"
+                },
+                "seito-openfile.searchSubFoldersOfWorkspaceFolders": {
+                    "type": "string",
+                    "default": "@(lib*|src|app|class*|module*|inc*|vendor?(s)|public)",
+                    "description": "Pattern of sub-folders under workspace folder(s) to be searched at second last, for relative paths.  For syntax reference glob/minimatch"
+                },
+                "seito-openfile.searchPaths": {
+                    "type": "array",
+                    "default": [],
+                    "description": "Paths to be added to search at last, for relative paths"
                 }
             }
         }
@@ -76,5 +90,9 @@
         "mocha": "^2.3.3",
         "@types/node": "^6.0.40",
         "@types/mocha": "^2.2.32"
+    },
+    "dependencies": {
+        "glob": "^7.1.2",
+        "true-case-path": "^1.0.0"
     }
 }

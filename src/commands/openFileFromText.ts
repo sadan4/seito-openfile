@@ -6,6 +6,9 @@ import { existsSync } from 'fs';
 import { ConfigHandler } from '../configuration/confighandler';
 import { TextOperations } from '../common/textoperations';
 import { FileOperations } from '../common/fileoperations';
+import { isArray } from 'util';
+var glob = require('glob');
+var trueCasePathSync = require('true-case-path');
 
 
 export class OpenFileFromText {
@@ -72,7 +75,12 @@ export class OpenFileFromText {
 		}
 		let extensions = [assumeExtWithoutDot];
 		if (assumeExt !== '') {	// lookup path has no extension
-			extensions = this.mergeDeduplicate(extensions, ConfigHandler.Instance.Configuration.Extensions);
+			let extensionsMap = this.configHandler.Configuration.ExtraExtensionsForTypes;
+			debug(extensionsMap, assumeExtWithoutDot, extensionsMap[assumeExtWithoutDot], isArray(extensionsMap[assumeExtWithoutDot]));
+			let extraExtensions = [];
+			if (assumeExtWithoutDot in extensionsMap && isArray(extensionsMap[assumeExtWithoutDot]))
+				extraExtensions = [...extensionsMap[assumeExtWithoutDot]];
+			extensions = this.mergeDeduplicate(extensions, extraExtensions, ConfigHandler.Instance.Configuration.Extensions);
 		}
 
 		// Find which workspace folder current editing document is in.  only lookup parents folders if isWithinAWorkspaceFolder
@@ -103,6 +111,45 @@ export class OpenFileFromText {
 			basePath = dirname(basePath); // go up one folder level
 		}
 
+		// Search workspace folders and some subfolders under them.  Not fuzzily, only default to current document's file extension if none (+ assumeExt).
+		let workspaceFolders = [];
+		if (isWithinAWorkspaceFolder)
+			workspaceFolders.push(currentWorkspaceFolderObj);
+		workspaceFolders = this.mergeDeduplicate(vscode.workspace.workspaceFolders);
+		for (let workspaceFolderObj of workspaceFolders) {
+			let workspaceFolder = workspaceFolderObj.uri.fsPath;
+
+			// Search a workspace folder
+			if (workspaceFolder !== currentWorkspaceFolder) {
+				debug('Search workspaceFolder', workspaceFolder);
+				let p = FileOperations.getAbsoluteFromRelativePath(inputPath + assumeExt, join(workspaceFolder), true);
+				if (existsSync(p))
+					return p;
+			}
+
+			// Search some subfolders under the workspace folder
+			// let workspaceSubFolders = ["lib", "src", "app", "class", "module", "inc", "vendor", "public"]; // "class*", "module*", "inc*"
+			let subFoldersPattern = this.configHandler.Configuration.SearchSubFoldersOfWorkspaceFolders; // default: "@(lib*|src|app|class*|module*|inc*|vendor?(s)|public)";
+			let workspaceSubFolders = glob.sync(subFoldersPattern, { cwd: workspaceFolder });
+
+			debug('Searching sub-folders of workspaceFolder', workspaceFolder, 'are', workspaceSubFolders.join(','));
+			for (let folder of workspaceSubFolders) {
+				debug('workspaceFolder/folder is', join(workspaceFolder, folder));
+				let p = FileOperations.getAbsoluteFromRelativePath(inputPath + assumeExt, join(workspaceFolder, folder), true);
+				if (existsSync(p))
+					return p;
+			}
+		}
+
+		// Addition search paths
+		let searchPaths = this.configHandler.Configuration.SearchPaths;
+		for (let folder of searchPaths) {
+			debug('searchPath is', join(folder));
+			let p = FileOperations.getAbsoluteFromRelativePath(inputPath + assumeExt, join(folder), true);
+			if (existsSync(p))
+				return p;
+		}
+
 		debug('No more match folders to lookup');
 		return '';
 	}
@@ -115,6 +162,7 @@ export class OpenFileFromText {
 			let fileAndLine = TextOperations.getPathAndLineNumber(iWord);
 			let p = this.resolvePath(fileAndLine.file);
 			if (p !== '') {
+				p = trueCasePathSync(p); // Avoid open document as non-matching case.  E.g. input text is "Extension.js" but real file name is extension.js, without this code, file opened and shown as "Extension.js" on Windows because file name are case insensitive.
 				vscode.workspace.openTextDocument(p).then((iDoc) => {
 					if (iDoc !== undefined) {
 						vscode.window.showTextDocument(iDoc).then((iEditor) => {
