@@ -27,8 +27,11 @@ export class OpenFileFromText {
 	public execute() {
 		for (let i: number = 0; i < this.editor.selections.length; i++) {
 			let word = this.getWordRange(this.editor.selections[i]);
-			this.openDocument(word);
-			console.log("Execute command", word);
+			this.openDocument(word).then(path => {
+				console.log("Execute command", word + ': Path found:', path);
+			}).catch(error => {
+				console.log("Execute command", word + ':', error);
+			});
 		}
 	}
 
@@ -58,10 +61,16 @@ export class OpenFileFromText {
 								let range = iEditor.document.lineAt(fileAndLine.line - 1).range;
 								iEditor.selection = new vscode.Selection(range.start, range.end);
 								iEditor.revealRange(range, vscode.TextEditorRevealType.InCenter);
-								resolve("");
+								resolve(p + ":" + fileAndLine.line);
+							} else {
+								resolve(p);
 							}
 						});
+					} else {
+						reject("Something went wrong with openTextDocument"); // impossible?
 					}
+				}, (reason: Error) => {
+					reject("Cannot open file: " + reason.message);
 				});
 			}
 			else {
