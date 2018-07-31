@@ -39,6 +39,29 @@ export class FileOperations
 	}
 
 	/**
+	 * Allow iPath to be like "/sth", but append it to iCurrPath, not treating it as absolute path.
+	 */
+	public static getAbsoluteFromAlwaysRelativePath(iPath:string, iCurrPath:string, baseMustBeDir = false): string
+	{
+		if( iPath === undefined || iPath === "" || iCurrPath === undefined || iCurrPath === "" )
+			return "";
+
+		try
+		{
+			if( !baseMustBeDir && statSync(iCurrPath).isFile )
+			{
+				iCurrPath = dirname(iCurrPath);
+			}
+
+			return join(iCurrPath, iPath);
+		}
+		catch(error)
+		{
+			return "";
+		}
+	}
+
+	/**
 	 * Only return a matched path if the file actually exists.
 	 */
 	public static getAbsolutePathFromFuzzyPath(iPath:string, iCurrPath:string, iSuffix, baseMustBeDir = false): string
