@@ -68,7 +68,7 @@
                 },
                 "seito-openfile.searchSubFoldersOfWorkspaceFolders": {
                     "type": "string",
-                    "default": "@(lib*|src|app|class*|module*|inc*|vendor?(s)|public)",
+                    "default": "@(lib*|lib*/*|src|src/*|app|app/*|class*|class*/*|module*|inc*|vendor|vendor/*|public)",
                     "description": "Pattern of sub-folders under workspace folder(s) to be searched at second last, for relative paths.  For syntax reference glob/minimatch"
                 },
                 "seito-openfile.searchPaths": {
