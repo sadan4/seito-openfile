@@ -2,7 +2,7 @@
 
 import * as vscode from 'vscode';
 import { dirname, extname, join, isAbsolute, basename } from 'path';
-import { existsSync } from 'fs';
+import { existsSync, lstatSync } from 'fs';
 import { ConfigHandler } from '../configuration/confighandler';
 import { TextOperations } from '../common/textoperations';
 import { FileOperations } from '../common/fileoperations';
@@ -61,7 +61,7 @@ export class OpenFileFromText {
 
 		// First, try relative to current document's folder, or absolute path, or relative to "~"
 		let p = FileOperations.getAbsoluteFromRelativePath(inputPath, basePath, true);
-		if (existsSync(p))
+		if (existsSync(p) && lstatSync(p).isFile())
 			return p;
 
 		let isHomePath = inputPath[0] === "~";
