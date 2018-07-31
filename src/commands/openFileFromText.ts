@@ -51,10 +51,13 @@ export class OpenFileFromText {
 	 */
 	public resolvePath(inputPath: string): string {
 		let debug = (...args) => {
-			// console.debug(...args);		// un-comment this to debug
+			// console.log(...args);		// un-comment this to debug
 		};
 		let currentDocFileName = this.editor ? this.editor.document.fileName : '';
 		let basePath = dirname(currentDocFileName);
+
+		// Normalize \ to / in the file string (\ not work for existsSync on linux-like), to support e.g. "use namespace\Class;" with path path/to/class/namespace/Class.php in PHP.
+		inputPath = inputPath.replace(/\\/g, '/');
 
 		// First, try relative to current document's folder, or absolute path, or relative to "~"
 		let p = FileOperations.getAbsoluteFromRelativePath(inputPath, basePath, true);
