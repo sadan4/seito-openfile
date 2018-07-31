@@ -7,7 +7,7 @@ import { ConfigHandler } from '../configuration/confighandler';
 import { TextOperations } from '../common/textoperations';
 import { FileOperations } from '../common/fileoperations';
 import { isArray } from 'util';
-var glob = require('glob');
+var glob = require('glob-all');
 var trueCasePathSync = require('true-case-path');
 
 

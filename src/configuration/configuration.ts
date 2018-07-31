@@ -7,7 +7,7 @@ export class Configuration
 	private m_bound: RegExp;
 	private m_extensions: Array<string>;
 	private m_extraExtensionsForTypes: object;
-	private m_searchSubFoldersOfWorkspaceFolders: string;
+	private m_searchSubFoldersOfWorkspaceFolders: Array<string>;
 	private m_searchPaths: Array<string>;
 
 	public constructor()
@@ -15,7 +15,7 @@ export class Configuration
 		this.m_bound = new RegExp("[\\s\\\"\\\'\\>\\<#]");
 		this.m_extensions = new Array<string>();
 		this.m_extraExtensionsForTypes = {};
-		this.m_searchSubFoldersOfWorkspaceFolders = '';
+		this.m_searchSubFoldersOfWorkspaceFolders = new Array<string>();
 		this.m_searchPaths = new Array<string>();
 	}
 
@@ -66,15 +66,15 @@ export class Configuration
 		return this.m_extraExtensionsForTypes;
 	}
 
-	set SearchSubFoldersOfWorkspaceFolders(iPattern: string)
+	set SearchSubFoldersOfWorkspaceFolders(iPatterns: Array<string>)
 	{
-		if( iPattern !== undefined )
+		if( iPatterns !== undefined )
 		{
-			this.m_searchSubFoldersOfWorkspaceFolders = iPattern;
+			this.m_searchSubFoldersOfWorkspaceFolders = iPatterns;
 		}
 	}
 
-	get SearchSubFoldersOfWorkspaceFolders(): string
+	get SearchSubFoldersOfWorkspaceFolders(): Array<string>
 	{
 		return this.m_searchSubFoldersOfWorkspaceFolders;
 	}

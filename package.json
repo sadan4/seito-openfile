@@ -61,15 +61,33 @@
                 "seito-openfile.extraExtensionsForTypes": {
                     "type": "object",
                     "default": {
-                        "js": ["jsx"],
-                        "jsx": ["js"]
+                        "js": [
+                            "jsx"
+                        ],
+                        "jsx": [
+                            "js"
+                        ]
                     },
                     "description": "Known suffixes to look for when file string has no suffix, according to current document's type. (suffix match is relative to current document's parent folders only)"
                 },
                 "seito-openfile.searchSubFoldersOfWorkspaceFolders": {
-                    "type": "string",
-                    "default": "@(lib*|lib*/*|src|src/*|app|app/*|class*|class*/*|module*|inc*|vendor|vendor/*|public)",
-                    "description": "Pattern of sub-folders under workspace folder(s) to be searched at second last, for relative paths.  For syntax reference glob/minimatch"
+                    "type": "array",
+                    "default": [
+                        "lib*/",
+                        "lib*/*/",
+                        "src/",
+                        "src/*/",
+                        "app/",
+                        "app/*/",
+                        "class?(es)/",
+                        "class?(es)/*/",
+                        "module?(s)/",
+                        "inc*/",
+                        "vendor?(s)/",
+                        "vendor?(s)/*/",
+                        "public/"
+                    ],
+                    "description": "Patterns of sub-folders under workspace folder(s) to be searched at second last, for relative paths.  For syntax reference glob-all/minimatch"
                 },
                 "seito-openfile.searchPaths": {
                     "type": "array",
@@ -92,7 +110,7 @@
         "@types/mocha": "^2.2.32"
     },
     "dependencies": {
-        "glob": "^7.1.2",
+        "glob-all": "^3.1.0",
         "true-case-path": "^1.0.0"
     }
 }
