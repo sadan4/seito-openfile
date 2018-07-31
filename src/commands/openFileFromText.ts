@@ -105,7 +105,7 @@ export class OpenFileFromText {
 				return;
 
 			// From now on, treat even '/path/to/something' as relative path.  Thus, cut the leading slash/backslash
-			if (inputPath.match(/^[\/\\]/) {
+			if (inputPath.match(/^[\/\\]/)) {
 				inputPath = inputPath.substr(1);
 			}
 		}

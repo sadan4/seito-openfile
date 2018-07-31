@@ -46,7 +46,7 @@ export class ConfigHandler
 			}
 			if( config.has("searchSubFoldersOfWorkspaceFolders") === true )
 			{
-				this.m_configuration.SearchSubFoldersOfWorkspaceFolders = config.get("searchSubFoldersOfWorkspaceFolders") as string;
+				this.m_configuration.SearchSubFoldersOfWorkspaceFolders = config.get("searchSubFoldersOfWorkspaceFolders") as string[];
 			}
 			if( config.has("searchPaths") === true )
 			{
