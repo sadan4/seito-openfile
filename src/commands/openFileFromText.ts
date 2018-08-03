@@ -28,13 +28,19 @@ export class OpenFileFromText {
 	}
 
 	public execute() {
-		for (let i: number = 0; i < this.editor.selections.length; i++) {
-			let word = this.getWordRange(this.editor.selections[i]);
-			this.openDocument(word).then(path => {
-				console.log("Execute command", word + ': Path found:', path);
-			}).catch(error => {
-				console.log("Execute command", word + ':', error);
-			});
+		let numSelections = this.editor.selections.length;
+		let openForceNewTab = numSelections > 1;	// if there are more than 1 file to open, open in new tab for all.
+		for (let i: number = 0; i < numSelections; i++) {
+			let words = this.getWordRanges(this.editor.selections[i]);
+			if (!openForceNewTab && words.length > 1)
+				openForceNewTab = true;
+			for (let word of words) {
+				this.openDocument(word, openForceNewTab).then(path => {
+					console.log("Execute command", word + ': Path found:', path);
+				}).catch(error => {
+					console.log("Execute command", word + ':', error);
+				});
+			}
 		}
 	}
 
@@ -168,7 +174,7 @@ export class OpenFileFromText {
 		return '';
 	}
 
-	public openDocument(iWord: string): Promise<any> {
+	public openDocument(iWord: string, iForceNewTab: boolean = false): Promise<any> {
 		return new Promise<any>((resolve, reject) => {
 			if (iWord === undefined || iWord === "")
 				reject("Something went wrong");
@@ -179,8 +185,8 @@ export class OpenFileFromText {
 				p = trueCasePathSync(p); // Avoid open document as non-matching case.  E.g. input text is "Extension.js" but real file name is extension.js, without this code, file opened and shown as "Extension.js" on Windows because file name are case insensitive.
 				vscode.workspace.openTextDocument(p).then((iDoc) => {
 					if (iDoc !== undefined) {
-						vscode.window.showTextDocument(iDoc).then((iEditor) => {
-							if (fileAndLine.line !== -1) {
+						vscode.window.showTextDocument(iDoc, (iForceNewTab ? { preview: false } : {})).then((iEditor) => {
+							if (fileAndLine.line > 0 && fileAndLine.line <= iEditor.document.lineCount) {
 								let range = iEditor.document.lineAt(fileAndLine.line - 1).range;
 								iEditor.selection = new vscode.Selection(range.start, range.end);
 								iEditor.revealRange(range, vscode.TextEditorRevealType.InCenter);
@@ -188,6 +194,8 @@ export class OpenFileFromText {
 							} else {
 								resolve(p);
 							}
+						}, (reason: Error) => {
+							reject("Something went wrong with showTextDocument: " + reason.message);
 						});
 					} else {
 						reject("Something went wrong with openTextDocument"); // impossible?
@@ -213,20 +221,22 @@ export class OpenFileFromText {
 		return '';
 	}
 
-	public getWordRange(selection: vscode.Selection) {
+	public getWordRanges(selection: vscode.Selection) {
 		let line: string;
 		let start: vscode.Position;
 		if (this.editor.selection.isEmpty) {
-			line = TextOperations.getCurrentLine(this.editor.document.getText(),
-				selection.active.line);
+			line = this.editor.document.lineAt(selection.active.line).text;
 			start = selection.active;
+			return [TextOperations.getWordBetweenBounds(line, start, this.configHandler.Configuration.Bound)];
 		}
 		else {
-			line = TextOperations.getCurrentLine(this.editor.document.getText(),
-				selection.start.line);
-			return TextOperations.getWordOfSelection(line, selection);
+			let multiLinesText = this.editor.document.getText(selection);
+			let lines = multiLinesText.split(/\r\n?|\n/);
+			if (lines.length > 1 && lines[lines.length - 1] === '') {	// pop last extra empty line after the last newline char
+				lines.pop();
+			}
+			return lines;
 		}
-		return TextOperations.getWordBetweenBounds(line, start, this.configHandler.Configuration.Bound);
 	}
 
 }
