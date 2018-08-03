@@ -46,21 +46,35 @@ export class TextOperations
 		return "";
 	}
 
-	public static getPathAndLineNumber(iWord:string): any
+	public static getPathAndPosition(iWord:string): any
 	{
 		let fileAndLine = {
 			file: iWord,
-			line: -1
+			line: -1,
+			column: -1
 		};
 		
-		if (fileAndLine.file.lastIndexOf(":") > -1) {
 			const lPos = iWord.lastIndexOf(":");
-			fileAndLine.file = iWord.substring(0, lPos);
-			fileAndLine.line = parseInt(iWord.substring(lPos+1));
-			if( isNaN(fileAndLine.line) )
-			{
-				fileAndLine.file = (iWord.length === lPos+1 ? iWord.substring(0,lPos) : iWord);
-				fileAndLine.line = -1;
+		if (lPos > -1) {
+			let numberAfterLastColon = parseInt(iWord.substring(lPos+1));	// use original parseInt, may not accurate and thus only limit start with number after colon
+			if( isNaN(numberAfterLastColon) ) {
+				fileAndLine.file = (iWord.length === lPos+1 ? iWord.substring(0,lPos) : iWord);	// FIXME: actually (iWord.length === lPos+1) never happen, because numberAfterLastColon == "" and isNaN("") === false
+				fileAndLine.line = fileAndLine.column = -1;
+			} else {
+				let b4Num = lPos - 1;
+				while (b4Num > 0 && iWord[b4Num] >= '0' && iWord[b4Num] <= '9')
+					--b4Num;
+				let fileEnd;
+				if (b4Num < lPos - 1 && iWord[b4Num] == ':') {	// i.e. :<integer> before this colon
+					fileAndLine.line = parseInt(iWord.substring(b4Num + 1, lPos));
+					fileAndLine.column = numberAfterLastColon;
+					fileEnd = b4Num;
+				} else {
+					fileAndLine.line = numberAfterLastColon;
+					fileAndLine.column = -1;
+					fileEnd = lPos;
+				}
+				fileAndLine.file = iWord.substring(0, fileEnd);
 			}
 		}
 		return fileAndLine;

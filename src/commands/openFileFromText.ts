@@ -179,18 +179,34 @@ export class OpenFileFromText {
 			if (iWord === undefined || iWord === "")
 				reject("Something went wrong");
 
-			let fileAndLine = TextOperations.getPathAndLineNumber(iWord);
+			let fileAndLine = TextOperations.getPathAndPosition(iWord);
 			let p = this.resolvePath(fileAndLine.file);
 			if (p !== '') {
 				p = trueCasePathSync(p); // Avoid open document as non-matching case.  E.g. input text is "Extension.js" but real file name is extension.js, without this code, file opened and shown as "Extension.js" on Windows because file name are case insensitive.
 				vscode.workspace.openTextDocument(p).then((iDoc) => {
 					if (iDoc !== undefined) {
-						vscode.window.showTextDocument(iDoc, (iForceNewTab ? { preview: false } : {})).then((iEditor) => {
-							if (fileAndLine.line > 0 && fileAndLine.line <= iEditor.document.lineCount) {
-								let range = iEditor.document.lineAt(fileAndLine.line - 1).range;
-								iEditor.selection = new vscode.Selection(range.start, range.end);
-								iEditor.revealRange(range, vscode.TextEditorRevealType.InCenter);
-								resolve(p + ":" + fileAndLine.line);
+						let showOptions = {};
+						if (iForceNewTab)
+							showOptions['preview'] = false;
+						let targetSelection = new vscode.Selection(0, 0, 0, 0);
+						if (fileAndLine.line > 0) {
+							let pos = new vscode.Position(fileAndLine.line - 1, fileAndLine.column > 0 ? fileAndLine.column - 1 : 0);
+							targetSelection = new vscode.Selection(pos, pos);
+							if (fileAndLine.column < 0) {
+								// Optional: this preserve old plug-in's behavior that whole line is selected
+								let range = iDoc.lineAt(fileAndLine.line - 1).range;
+								targetSelection = new vscode.Selection(range.start, range.end);
+							}
+							showOptions['selection'] = targetSelection;
+						}
+						vscode.window.showTextDocument(iDoc, showOptions).then((iEditor) => {
+							if (fileAndLine.line > 0) {
+								// Commented.  Let showOptions['selection'] do the following.
+								/* if (fileAndLine.line <= iDoc.lineCount) {
+									iEditor.selection = targetSelection;
+									iEditor.revealRange(targetSelection, vscode.TextEditorRevealType.InCenter);
+								} */
+								resolve(p + ":" + fileAndLine.line + (fileAndLine.column > 0 ? ":" + fileAndLine.column : ""));
 							} else {
 								resolve(p);
 							}
