@@ -109,11 +109,16 @@ export class TextOperations
 				break;
 			if (t === ':') {
 				let lineColMatches = iText.substring(i,j).match(/:\d+(:\d+)?$/);
-				if (lineColMatches) {	// if the string before this ':' is already ":<number>", gonna stops
-					if (lineColMatches[1] === undefined) {	// doesn't have column number before yet, so read any "<column>:" beyond this colon
-						let matches = iText.substring(j + 1, end).match(/^(\d+)($|:)/);
-						if (matches)
-							j += 1 + matches[1].length;
+				if (lineColMatches) {	// if the string before this ':' is already ":<number>[:<column>]", gonna stops, to remove any grep output like ":<matching-line>" at j
+					if (lineColMatches[1] === undefined) {	// doesn't have column number before yet, so read any valid ":<column>" pattern at this colon
+						let iSkipNum = j + 1;
+						while (iSkipNum < end && iText[iSkipNum] >= '0' && iText[iSkipNum] <= '9')
+							iSkipNum++;
+						if (iSkipNum > j + 1) {		// i.e. is ":<number>" at j
+							if (iSkipNum == end || iText[iSkipNum] == ':' || iText[iSkipNum].match(bounds) !== null) {	// at j, accept the column number if it's either :col or :col:... or :col<path-delimiter>
+								j = iSkipNum;
+							}
+						}
 					}
 					break;
 				}
