@@ -177,7 +177,7 @@ export class OpenFileFromText {
 	public openDocument(iWord: string, iForceNewTab: boolean = false): Promise<any> {
 		return new Promise<any>((resolve, reject) => {
 			if (iWord === undefined || iWord === "")
-				reject("Something went wrong");
+				reject("Path is empty");
 
 			let fileAndLine = TextOperations.getPathAndPosition(iWord);
 			let p = this.resolvePath(fileAndLine.file);

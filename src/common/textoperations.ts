@@ -92,15 +92,16 @@ export class TextOperations
 		if( end < i )
 			return "";
 
+		i--;	// Fix: allow cursor touching the right-edge of the target path to work properly
 		for(; i>=0; i--)
 		{
 			let t = iText[i];
 			if( t.match(bounds) !== null )
 			{
-				i++;
 				break;
 			}
 		}
+		i++;
 		for(; j<end; j++)
 		{
 			let t = iText[j];
