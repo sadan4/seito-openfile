@@ -53,6 +53,11 @@
                     "default": "[\\s\\\"\\'\\>\\<#;]",
                     "description": "The RegExp to define the bound of the path string"
                 },
+                "seito-openfile.lookupTildePathAlsoFromWorkspace": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Whether to lookup path string which start with '~' relative to workspace if not found at user's home."
+                },
                 "seito-openfile.extensions": {
                     "type": "array",
                     "default": [],

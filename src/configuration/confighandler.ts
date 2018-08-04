@@ -52,6 +52,10 @@ export class ConfigHandler
 			{
 				this.m_configuration.SearchPaths = config.get("searchPaths") as string[];
 			}
+			if( config.has("lookupTildePathAlsoFromWorkspace") === true )
+			{
+				this.m_configuration.LookupTildePathAlsoFromWorkspace = config.get("lookupTildePathAlsoFromWorkspace") as boolean;
+			}
 		}
 	}
 }

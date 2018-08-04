@@ -72,8 +72,13 @@ export class OpenFileFromText {
 
 		let isHomePath = inputPath[0] === "~";
 		let isAbsolutePath = isAbsolute(inputPath);
-		if (isHomePath || (isAbsolutePath && !inputPath.match(/^[\/\\][^\/\\]/))) // only relative path (or absolute path start with single slash/backslash, not C: drive) can continue to lookup from other folders
+		let tryWorkspaceHomePath = false;
+		if (isHomePath && ConfigHandler.Instance.Configuration.LookupTildePathAlsoFromWorkspace)
+			tryWorkspaceHomePath = true;
+		if ( (isHomePath && !tryWorkspaceHomePath) ||
+				(isAbsolutePath && !inputPath.match(/^[\/\\][^\/\\]/)) ) { // only relative path (or absolute path start with single slash/backslash, not C: drive) can continue to lookup from other folders
 			return '';
+		}
 
 		let finalConditionRe = new RegExp('^$|[/\\\\:][/\\\\]?$');
 		let assumeExt = '';
@@ -108,27 +113,33 @@ export class OpenFileFromText {
 		debug('Implicit extensions are', extensions.join(','));
 
 		// Try fuzzy for single leading slash/backslash absolute path
-		if (isAbsolutePath) {
+		if (isAbsolutePath || tryWorkspaceHomePath) {
 			p = this.getAbsolutePathFromFuzzyPathWithMultipleExtensions(inputPath, basePath, extensions, true);
 			if (p != '')
 				return;
 
-			// From now on, treat even '/path/to/something' as relative path.  Thus, cut the leading slash/backslash
-			if (inputPath.match(/^[\/\\]/)) {
-				inputPath = inputPath.substr(1);
+			if (isAbsolutePath) {
+				// From now on, treat even '/path/to/something' as relative path.  Thus, cut the leading slash/backslash
+				if (inputPath.match(/^[\/\\]/)) {
+					inputPath = inputPath.substr(1);
+				}
+			} else {
+				inputPath = inputPath.replace(/^~[\/\\]/, '');
 			}
 		}
 
 		// Lookup from current document's folder up to its corresponding workspace folder (if none match, just search current document's folder fuzzily)
-		while (true) {
-			debug('basePath is', basePath);
-			p = this.getAbsolutePathFromFuzzyPathWithMultipleExtensions(inputPath, basePath, extensions, true);
-			if (p != '') {
-				return p;
+		if (!tryWorkspaceHomePath) {
+			while (true) {
+				debug('basePath is', basePath);
+				p = this.getAbsolutePathFromFuzzyPathWithMultipleExtensions(inputPath, basePath, extensions, true);
+				if (p != '') {
+					return p;
+				}
+				if (finalConditionRe.test(basePath) || !isWithinAWorkspaceFolder || join(basePath) === currentWorkspaceFolder) // break at workspace folder, or root path of system (finalConditionRe)
+					break;
+				basePath = dirname(basePath); // go up one folder level
 			}
-			if (finalConditionRe.test(basePath) || !isWithinAWorkspaceFolder || join(basePath) === currentWorkspaceFolder) // break at workspace folder, or root path of system (finalConditionRe)
-				break;
-			basePath = dirname(basePath); // go up one folder level
 		}
 
 		// Search workspace folders and some subfolders under them.  Not fuzzily, only default to current document's file extension if none (+ assumeExt).
@@ -140,7 +151,7 @@ export class OpenFileFromText {
 			let workspaceFolder = workspaceFolderObj.uri.fsPath;
 
 			// Search a workspace folder
-			if (workspaceFolder !== currentWorkspaceFolder) {
+			if (workspaceFolder !== currentWorkspaceFolder || tryWorkspaceHomePath) {
 				debug('Search workspaceFolder', workspaceFolder);
 				let p = FileOperations.getAbsoluteFromAlwaysRelativePath(inputPath + assumeExt, join(workspaceFolder), true);
 				if (existsSync(p))
@@ -162,7 +173,7 @@ export class OpenFileFromText {
 		}
 
 		// Addition search paths
-		let searchPaths = this.configHandler.Configuration.SearchPaths;
+		let searchPaths = tryWorkspaceHomePath ? [] : this.configHandler.Configuration.SearchPaths;
 		for (let folder of searchPaths) {
 			debug('searchPath is', join(folder));
 			let p = FileOperations.getAbsoluteFromAlwaysRelativePath(inputPath + assumeExt, join(folder), true);
