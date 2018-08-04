@@ -53,8 +53,8 @@ export class TextOperations
 			line: -1,
 			column: -1
 		};
-		
-			const lPos = iWord.lastIndexOf(":");
+
+		const lPos = iWord.lastIndexOf(":");
 		if (lPos > -1) {
 			let numberAfterLastColon = parseInt(iWord.substring(lPos+1));	// use original parseInt, may not accurate and thus only limit start with number after colon
 			if( isNaN(numberAfterLastColon) ) {
@@ -107,11 +107,22 @@ export class TextOperations
 			let t = iText[j];
 			if( t.match(bounds) !== null )
 				break;
+			if (t === ':') {
+				let lineColMatches = iText.substring(i,j).match(/:\d+(:\d+)?$/);
+				if (lineColMatches) {	// if the string before this ':' is already ":<number>", gonna stops
+					if (lineColMatches[1] === undefined) {	// doesn't have column number before yet, so read any "<column>:" beyond this colon
+						let matches = iText.substring(j + 1, end).match(/^(\d+)($|:)/);
+						if (matches)
+							j += 1 + matches[1].length;
+					}
+					break;
+				}
+			}
 		}
 		return iText.substring(i,j);
 
 	}
-	
+
 	public static getWordOfSelection(iText: string, iSelection:vscode.Selection): string
 	{
 		let bounds: RegExp = ConfigHandler.Instance.Configuration.Bound;

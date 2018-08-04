@@ -251,6 +251,7 @@ export class OpenFileFromText {
 			if (lines.length > 1 && lines[lines.length - 1] === '') {	// pop last extra empty line after the last newline char
 				lines.pop();
 			}
+			lines = lines.map(line => line.replace(/((:\d+){1,2}):.*|:$/, '$1'));	// remove ":..." from ":line[:column]:..."
 			return lines;
 		}
 	}
