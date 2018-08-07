@@ -9,9 +9,9 @@ import { Configuration } from '../configuration/configuration';
 
 export class FileOperations
 {
-	public static getAbsoluteFromRelativePath(iPath:string, iCurrPath:string): string
+	public static getAbsoluteFromRelativePath(iPath:string, iCurrPath:string, baseMustBeDir = false): string
 	{
-		if( iPath === undefined || iPath === "" || iCurrPath === undefined || iCurrPath === "" )
+		if( iPath === undefined || iPath === "" || iCurrPath === undefined )
 			return "";
 
 		try
@@ -23,7 +23,9 @@ export class FileOperations
 			}
 			else if( isAbsolute(iPath) )
 				return join(iPath);
-			else if( statSync(iCurrPath).isFile )
+			else if( iCurrPath === "" ) // fault tolerant: only fail when not absolute or relative-to-home path, if iCurrPath is blank (fix some test case when activeTextEditor is null)
+				return "";
+			else if( !baseMustBeDir && statSync(iCurrPath).isFile )
 			{
 				iCurrPath = dirname(iCurrPath);
 			}
@@ -36,7 +38,33 @@ export class FileOperations
 		}
 	}
 
-	public static getAbsolutePathFromFuzzyPath(iPath:string, iCurrPath:string, iSuffix): string
+	/**
+	 * Allow iPath to be like "/sth", but append it to iCurrPath, not treating it as absolute path.
+	 */
+	public static getAbsoluteFromAlwaysRelativePath(iPath:string, iCurrPath:string, baseMustBeDir = false): string
+	{
+		if( iPath === undefined || iPath === "" || iCurrPath === undefined || iCurrPath === "" )
+			return "";
+
+		try
+		{
+			if( !baseMustBeDir && statSync(iCurrPath).isFile )
+			{
+				iCurrPath = dirname(iCurrPath);
+			}
+
+			return join(iCurrPath, iPath);
+		}
+		catch(error)
+		{
+			return "";
+		}
+	}
+
+	/**
+	 * Only return a matched path if the file actually exists.
+	 */
+	public static getAbsolutePathFromFuzzyPath(iPath:string, iCurrPath:string, iSuffix, baseMustBeDir = false): string
 	{
 		if( iPath === undefined || iPath === "" || iCurrPath === undefined || iCurrPath === "" )
 			return "";
@@ -56,21 +84,23 @@ export class FileOperations
 		let p = path;
 		if( fileName.lastIndexOf(".") == -1 )
 		{
-			f += "." + iSuffix;
+			if (iSuffix !== '') {	// iSuffix may be empty now
+				f += "." + iSuffix;
+			}
 			p += f;
 		}
 		else
 		{
 			p += f;
 		}
-		retVal = this.getAbsoluteFromRelativePath(p, iCurrPath);
+		retVal = this.getAbsoluteFromRelativePath(p, iCurrPath, baseMustBeDir);
 		if(!existsSync(retVal))
 		{
 			if( fileName.indexOf("_") == -1 || fileName.indexOf("_") > 0 )
 			{
 				f = "_" + f;
 				p = path + f;
-				retVal = this.getAbsoluteFromRelativePath(p, iCurrPath);
+				retVal = this.getAbsoluteFromRelativePath(p, iCurrPath, baseMustBeDir);
 			}
 		}
 		if(existsSync(retVal))
