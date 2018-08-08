@@ -136,8 +136,8 @@ suite("File operation Tests", () => {
 		let configHandler: ConfigHandler = ConfigHandler.Instance;
 		let openFile: OpenFileFromText = new OpenFileFromText(
 				vscode.window.activeTextEditor, configHandler);
-		openFile.openDocument("d:/Temp/test/testcase.txt:2").then(value => {
-			assert.equal(vscode.window.activeTextEditor.document.fileName,"d:\\Temp\\test\\testcase.txt");
+		openFile.openDocument("d:/TEMP/test/testcase.txt:2").then(value => {
+			assert.equal(vscode.window.activeTextEditor.document.fileName,"d:\\TEMP\\test\\testcase.txt");
 			console.log(value);
 			done();
 		}).catch(value => {
