@@ -28,13 +28,19 @@ export class OpenFileFromText {
 	}
 
 	public execute() {
-		for (let i: number = 0; i < this.editor.selections.length; i++) {
-			let word = this.getWordRange(this.editor.selections[i]);
-			this.openDocument(word).then(path => {
-				console.log("Execute command", word + ': Path found:', path);
-			}).catch(error => {
-				console.log("Execute command", word + ':', error);
-			});
+		let numSelections = this.editor.selections.length;
+		let openForceNewTab = numSelections > 1;	// if there are more than 1 file to open, open in new tab for all.
+		for (let i: number = 0; i < numSelections; i++) {
+			let words = this.getWordRanges(this.editor.selections[i]);
+			if (!openForceNewTab && words.length > 1)
+				openForceNewTab = true;
+			for (let word of words) {
+				this.openDocument(word, openForceNewTab).then(path => {
+					console.log("Execute command", word + ': Path found:', path);
+				}).catch(error => {
+					console.log("Execute command", word + ':', error);
+				});
+			}
 		}
 	}
 
@@ -66,8 +72,13 @@ export class OpenFileFromText {
 
 		let isHomePath = inputPath[0] === "~";
 		let isAbsolutePath = isAbsolute(inputPath);
-		if (isHomePath || (isAbsolutePath && !inputPath.match(/^[\/\\][^\/\\]/))) // only relative path (or absolute path start with single slash/backslash, not C: drive) can continue to lookup from other folders
+		let tryWorkspaceHomePath = false;
+		if (isHomePath && ConfigHandler.Instance.Configuration.LookupTildePathAlsoFromWorkspace)
+			tryWorkspaceHomePath = true;
+		if ( (isHomePath && !tryWorkspaceHomePath) ||
+				(isAbsolutePath && !inputPath.match(/^[\/\\][^\/\\]/)) ) { // only relative path (or absolute path start with single slash/backslash, not C: drive) can continue to lookup from other folders
 			return '';
+		}
 
 		let finalConditionRe = new RegExp('^$|[/\\\\:][/\\\\]?$');
 		let assumeExt = '';
@@ -102,27 +113,33 @@ export class OpenFileFromText {
 		debug('Implicit extensions are', extensions.join(','));
 
 		// Try fuzzy for single leading slash/backslash absolute path
-		if (isAbsolutePath) {
+		if (isAbsolutePath || tryWorkspaceHomePath) {
 			p = this.getAbsolutePathFromFuzzyPathWithMultipleExtensions(inputPath, basePath, extensions, true);
 			if (p != '')
 				return;
 
-			// From now on, treat even '/path/to/something' as relative path.  Thus, cut the leading slash/backslash
-			if (inputPath.match(/^[\/\\]/)) {
-				inputPath = inputPath.substr(1);
+			if (isAbsolutePath) {
+				// From now on, treat even '/path/to/something' as relative path.  Thus, cut the leading slash/backslash
+				if (inputPath.match(/^[\/\\]/)) {
+					inputPath = inputPath.substr(1);
+				}
+			} else {
+				inputPath = inputPath.replace(/^~[\/\\]/, '');
 			}
 		}
 
 		// Lookup from current document's folder up to its corresponding workspace folder (if none match, just search current document's folder fuzzily)
-		while (true) {
-			debug('basePath is', basePath);
-			p = this.getAbsolutePathFromFuzzyPathWithMultipleExtensions(inputPath, basePath, extensions, true);
-			if (p != '') {
-				return p;
+		if (!tryWorkspaceHomePath) {
+			while (true) {
+				debug('basePath is', basePath);
+				p = this.getAbsolutePathFromFuzzyPathWithMultipleExtensions(inputPath, basePath, extensions, true);
+				if (p != '') {
+					return p;
+				}
+				if (finalConditionRe.test(basePath) || !isWithinAWorkspaceFolder || join(basePath) === currentWorkspaceFolder) // break at workspace folder, or root path of system (finalConditionRe)
+					break;
+				basePath = dirname(basePath); // go up one folder level
 			}
-			if (finalConditionRe.test(basePath) || !isWithinAWorkspaceFolder || join(basePath) === currentWorkspaceFolder) // break at workspace folder, or root path of system (finalConditionRe)
-				break;
-			basePath = dirname(basePath); // go up one folder level
 		}
 
 		// Search workspace folders and some subfolders under them.  Not fuzzily, only default to current document's file extension if none (+ assumeExt).
@@ -134,7 +151,7 @@ export class OpenFileFromText {
 			let workspaceFolder = workspaceFolderObj.uri.fsPath;
 
 			// Search a workspace folder
-			if (workspaceFolder !== currentWorkspaceFolder) {
+			if (workspaceFolder !== currentWorkspaceFolder || tryWorkspaceHomePath) {
 				debug('Search workspaceFolder', workspaceFolder);
 				let p = FileOperations.getAbsoluteFromAlwaysRelativePath(inputPath + assumeExt, join(workspaceFolder), true);
 				if (existsSync(p))
@@ -156,7 +173,7 @@ export class OpenFileFromText {
 		}
 
 		// Addition search paths
-		let searchPaths = this.configHandler.Configuration.SearchPaths;
+		let searchPaths = tryWorkspaceHomePath ? [] : this.configHandler.Configuration.SearchPaths;
 		for (let folder of searchPaths) {
 			debug('searchPath is', join(folder));
 			let p = FileOperations.getAbsoluteFromAlwaysRelativePath(inputPath + assumeExt, join(folder), true);
@@ -168,26 +185,44 @@ export class OpenFileFromText {
 		return '';
 	}
 
-	public openDocument(iWord: string): Promise<any> {
+	public openDocument(iWord: string, iForceNewTab: boolean = false): Promise<any> {
 		return new Promise<any>((resolve, reject) => {
 			if (iWord === undefined || iWord === "")
-				reject("Something went wrong");
+				reject("Path is empty");
 
-			let fileAndLine = TextOperations.getPathAndLineNumber(iWord);
+			let fileAndLine = TextOperations.getPathAndPosition(iWord);
 			let p = this.resolvePath(fileAndLine.file);
 			if (p !== '') {
 				p = trueCasePathSync(p); // Avoid open document as non-matching case.  E.g. input text is "Extension.js" but real file name is extension.js, without this code, file opened and shown as "Extension.js" on Windows because file name are case insensitive.
 				vscode.workspace.openTextDocument(p).then((iDoc) => {
 					if (iDoc !== undefined) {
-						vscode.window.showTextDocument(iDoc).then((iEditor) => {
-							if (fileAndLine.line !== -1) {
-								let range = iEditor.document.lineAt(fileAndLine.line - 1).range;
-								iEditor.selection = new vscode.Selection(range.start, range.end);
-								iEditor.revealRange(range, vscode.TextEditorRevealType.InCenter);
-								resolve(p + ":" + fileAndLine.line);
+						let showOptions = {};
+						if (iForceNewTab)
+							showOptions['preview'] = false;
+						let targetSelection = new vscode.Selection(0, 0, 0, 0);
+						if (fileAndLine.line > 0) {
+							let pos = new vscode.Position(fileAndLine.line - 1, fileAndLine.column > 0 ? fileAndLine.column - 1 : 0);
+							targetSelection = new vscode.Selection(pos, pos);
+							if (fileAndLine.column < 0) {
+								// Optional: this preserve old plug-in's behavior that whole line is selected
+								let range = iDoc.lineAt(fileAndLine.line - 1).range;
+								targetSelection = new vscode.Selection(range.start, range.end);
+							}
+							showOptions['selection'] = targetSelection;
+						}
+						vscode.window.showTextDocument(iDoc, showOptions).then((iEditor) => {
+							if (fileAndLine.line > 0) {
+								// Commented.  Let showOptions['selection'] do the following.
+								/* if (fileAndLine.line <= iDoc.lineCount) {
+									iEditor.selection = targetSelection;
+									iEditor.revealRange(targetSelection, vscode.TextEditorRevealType.InCenter);
+								} */
+								resolve(p + ":" + fileAndLine.line + (fileAndLine.column > 0 ? ":" + fileAndLine.column : ""));
 							} else {
 								resolve(p);
 							}
+						}, (reason: Error) => {
+							reject("Something went wrong with showTextDocument: " + reason.message);
 						});
 					} else {
 						reject("Something went wrong with openTextDocument"); // impossible?
@@ -213,20 +248,23 @@ export class OpenFileFromText {
 		return '';
 	}
 
-	public getWordRange(selection: vscode.Selection) {
+	public getWordRanges(selection: vscode.Selection) {
 		let line: string;
 		let start: vscode.Position;
 		if (this.editor.selection.isEmpty) {
-			line = TextOperations.getCurrentLine(this.editor.document.getText(),
-				selection.active.line);
+			line = this.editor.document.lineAt(selection.active.line).text;
 			start = selection.active;
+			return [TextOperations.getWordBetweenBounds(line, start, this.configHandler.Configuration.Bound)];
 		}
 		else {
-			line = TextOperations.getCurrentLine(this.editor.document.getText(),
-				selection.start.line);
-			return TextOperations.getWordOfSelection(line, selection);
+			let multiLinesText = this.editor.document.getText(selection);
+			let lines = multiLinesText.split(/\r\n?|\n/);
+			if (lines.length > 1 && lines[lines.length - 1] === '') {	// pop last extra empty line after the last newline char
+				lines.pop();
+			}
+			lines = lines.map(line => line.replace(/((:\d+){1,2}):.*/, '$1'));	// remove ":..." from ":line[:column]:..."
+			return lines;
 		}
-		return TextOperations.getWordBetweenBounds(line, start, this.configHandler.Configuration.Bound);
 	}
 
 }

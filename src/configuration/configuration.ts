@@ -9,6 +9,7 @@ export class Configuration
 	private m_extraExtensionsForTypes: object;
 	private m_searchSubFoldersOfWorkspaceFolders: Array<string>;
 	private m_searchPaths: Array<string>;
+	private m_lookupTildePathAlsoFromWorkspace: boolean;
 
 	public constructor()
 	{
@@ -17,6 +18,7 @@ export class Configuration
 		this.m_extraExtensionsForTypes = {};
 		this.m_searchSubFoldersOfWorkspaceFolders = new Array<string>();
 		this.m_searchPaths = new Array<string>();
+		this.m_lookupTildePathAlsoFromWorkspace = true;
 	}
 
 	get Bound(): RegExp
@@ -90,5 +92,16 @@ export class Configuration
 	get SearchPaths(): Array<string>
 	{
 		return this.m_searchPaths;
+	}
+
+	set LookupTildePathAlsoFromWorkspace(yesNo: boolean)
+	{
+		if ( yesNo !== undefined)
+			this.m_lookupTildePathAlsoFromWorkspace = yesNo;
+	}
+
+	get LookupTildePathAlsoFromWorkspace(): boolean
+	{
+		return this.m_lookupTildePathAlsoFromWorkspace;
 	}
 }
