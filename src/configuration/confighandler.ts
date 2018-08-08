@@ -40,6 +40,22 @@ export class ConfigHandler
 			{
 				this.m_configuration.Extensions = config.get("extensions") as string[];
 			}
+			if( config.has("extraExtensionsForTypes") === true )
+			{
+				this.m_configuration.ExtraExtensionsForTypes = config.get("extraExtensionsForTypes") as object;
+			}
+			if( config.has("searchSubFoldersOfWorkspaceFolders") === true )
+			{
+				this.m_configuration.SearchSubFoldersOfWorkspaceFolders = config.get("searchSubFoldersOfWorkspaceFolders") as string[];
+			}
+			if( config.has("searchPaths") === true )
+			{
+				this.m_configuration.SearchPaths = config.get("searchPaths") as string[];
+			}
+			if( config.has("lookupTildePathAlsoFromWorkspace") === true )
+			{
+				this.m_configuration.LookupTildePathAlsoFromWorkspace = config.get("lookupTildePathAlsoFromWorkspace") as boolean;
+			}
 		}
 	}
 }
