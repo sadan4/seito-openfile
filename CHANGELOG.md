@@ -1,5 +1,30 @@
 ## Release Notes
 
+### 1.7.0
+
+**Thanks to @johnnytemp** for his great work on the following features:
+- multiple selections can now open multiple files
+- open files defined as namespace ```use namespace\Class```
+- go to position now with columns ```file:line:column```
+- search relative to sub-folders under workspace folders (mainly under the "current" workspace folder, e.g. sub-folders like lib, src, class, public, vendor, etc)
+- allow lookup the text string relative to all folder levels, from current document's folder, up to the embedding workspace folder (when current document is in a workspace folder).
+(First file found is opened immediately. Thus, relative path to document's path is still highest priority)
+
+**New Configuration**
+```
+seito-openfile.lookupTildePathAlsoFromWorkspace
+seito-openfile.searchSubFoldersOfWorkspaceFolders
+```
+
+**Deprecated**
+```
+seito-openfile.extensions
+```
+**use** 
+```
+seito-openfile.extraExtensionsForTypes
+```
+
 ### 1.6.0
 
 - added a configuration for file extensions (thanks to @jackfranklin)
