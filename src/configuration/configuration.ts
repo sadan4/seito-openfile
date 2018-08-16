@@ -10,6 +10,7 @@ export class Configuration
 	private m_searchSubFoldersOfWorkspaceFolders: Array<string>;
 	private m_searchPaths: Array<string>;
 	private m_lookupTildePathAlsoFromWorkspace: boolean;
+	private m_leadingPathMapping: { [ leadingPath : string ] : string };
 	private m_notFoundTriggerQuickOpen: boolean;
 
 	public constructor()
@@ -20,6 +21,7 @@ export class Configuration
 		this.m_searchSubFoldersOfWorkspaceFolders = new Array<string>();
 		this.m_searchPaths = new Array<string>();
 		this.m_lookupTildePathAlsoFromWorkspace = true;
+		this.m_leadingPathMapping = {};
 		this.m_notFoundTriggerQuickOpen = true;
 	}
 
@@ -105,6 +107,17 @@ export class Configuration
 	get LookupTildePathAlsoFromWorkspace(): boolean
 	{
 		return this.m_lookupTildePathAlsoFromWorkspace;
+	}
+
+	set LeadingPathMapping(mappings: { [ leadingPath : string ] : string })
+	{
+		if ( mappings !== undefined)
+			this.m_leadingPathMapping = mappings;
+	}
+
+	get LeadingPathMapping(): { [ leadingPath : string ] : string }
+	{
+		return this.m_leadingPathMapping;
 	}
 
 	set NotFoundTriggerQuickOpen(yesNo: boolean)
