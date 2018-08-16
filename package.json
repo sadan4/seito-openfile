@@ -98,6 +98,11 @@
                     "type": "array",
                     "default": [],
                     "description": "Paths to be added to search at last, for relative paths"
+                },
+                "seito-openfile.notFoundTriggerQuickOpen": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "When enabled, if (a sole) file is not found by the normal logic, trigger VS Code's Quick Open input box for further search."
                 }
             }
         }

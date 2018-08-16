@@ -29,16 +29,24 @@ export class OpenFileFromText {
 
 	public execute() {
 		let numSelections = this.editor.selections.length;
-		let openForceNewTab = numSelections > 1;	// if there are more than 1 file to open, open in new tab for all.
+		let isOpeningMultipleFiles = numSelections > 1;	// if there are more than 1 file to open, open in new tab for all.
 		for (let i: number = 0; i < numSelections; i++) {
 			let words = this.getWordRanges(this.editor.selections[i]);
-			if (!openForceNewTab && words.length > 1)
-				openForceNewTab = true;
+			if (!isOpeningMultipleFiles && words.length > 1)
+				isOpeningMultipleFiles = true;
+			let openForceNewTab = isOpeningMultipleFiles;
 			for (let word of words) {
 				this.openDocument(word, openForceNewTab).then(path => {
 					console.log("Execute command", word + ': Path found:', path);
 				}).catch(error => {
 					console.log("Execute command", word + ':', error);
+					if (!isOpeningMultipleFiles && ConfigHandler.Instance.Configuration.NotFoundTriggerQuickOpen) {
+						// Note it is safe below to cut prefix '/' to make the absolute path relative, because if it is an absolute path and file exists, it should have opened directly.
+						vscode.commands.executeCommand(
+							'workbench.action.quickOpen',
+							word.replace(/^[\/\\\\]+|[\/\\\\]+$/g, '') 	// trim / and \ from both ends of file string
+						);
+					}
 				});
 			}
 		}

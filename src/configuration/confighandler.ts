@@ -56,6 +56,10 @@ export class ConfigHandler
 			{
 				this.m_configuration.LookupTildePathAlsoFromWorkspace = config.get("lookupTildePathAlsoFromWorkspace") as boolean;
 			}
+			if( config.has("notFoundTriggerQuickOpen") === true )
+			{
+				this.m_configuration.NotFoundTriggerQuickOpen = config.get("notFoundTriggerQuickOpen") as boolean;
+			}
 		}
 	}
 }

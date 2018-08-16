@@ -10,6 +10,7 @@ export class Configuration
 	private m_searchSubFoldersOfWorkspaceFolders: Array<string>;
 	private m_searchPaths: Array<string>;
 	private m_lookupTildePathAlsoFromWorkspace: boolean;
+	private m_notFoundTriggerQuickOpen: boolean;
 
 	public constructor()
 	{
@@ -19,6 +20,7 @@ export class Configuration
 		this.m_searchSubFoldersOfWorkspaceFolders = new Array<string>();
 		this.m_searchPaths = new Array<string>();
 		this.m_lookupTildePathAlsoFromWorkspace = true;
+		this.m_notFoundTriggerQuickOpen = true;
 	}
 
 	get Bound(): RegExp
@@ -103,5 +105,16 @@ export class Configuration
 	get LookupTildePathAlsoFromWorkspace(): boolean
 	{
 		return this.m_lookupTildePathAlsoFromWorkspace;
+	}
+
+	set NotFoundTriggerQuickOpen(yesNo: boolean)
+	{
+		if ( yesNo !== undefined)
+			this.m_notFoundTriggerQuickOpen = yesNo;
+	}
+
+	get NotFoundTriggerQuickOpen(): boolean
+	{
+		return this.m_notFoundTriggerQuickOpen;
 	}
 }
