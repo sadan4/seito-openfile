@@ -30,6 +30,12 @@
                 "title": "Open file under cursor"
             }
         ],
+        "keybindings": [
+            {
+              "command": "seito-openfile.openFileFromText",
+              "key": "alt+p"
+            }
+        ],
         "menus": {
             "commandPalette": [
                 {
