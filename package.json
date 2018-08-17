@@ -72,12 +72,14 @@
                 "seito-openfile.extraExtensionsForTypes": {
                     "type": "object",
                     "default": {
-                        "js": [
-                            "jsx"
-                        ],
-                        "jsx": [
-                            "js"
-                        ]
+                        "js": ["jsx"],
+                        "jsx": ["js"],
+                        "ts": ["js", "jsx"],
+                        "vue": ["js", "jsx"],
+                        "c": ["h"],
+                        "cpp": ["h", "hpp"],
+                        "m": ["h"],
+                        "mm": ["h", "hpp"]
                     },
                     "description": "Known suffixes to look for when file string has no suffix, according to current document's type. (suffix match is relative to current document's parent folders only)"
                 },
