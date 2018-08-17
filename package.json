@@ -28,14 +28,23 @@
                 "command": "seito-openfile.openFileFromText",
                 "category": "File",
                 "title": "Open file under cursor"
+            },
+            {
+                "command": "seito-openfile.openFileLikeThisFile",
+                "category": "File",
+                "title": "Open file like this file"
             }
         ],
         "keybindings": [
             {
-              "command": "seito-openfile.openFileFromText",
-              "key": "alt+p"
+                "command": "seito-openfile.openFileFromText",
+                "key": "alt+p"
+            },
+            {
+                "command": "seito-openfile.openFileLikeThisFile",
+                "key": "alt+q"
             }
-        ],
+          ],
         "menus": {
             "commandPalette": [
                 {

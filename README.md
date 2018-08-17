@@ -34,6 +34,7 @@ With this extension you can right-click on such a path and choose ```open file u
 - allow `/path/to/sth` to be lookup as both absolute and relative path.  Useful for code like `projectFolder + '/path/to/sth'`.
 - support opening single or multiple files from *Linux `grep` output* with line number, which has the line pattern `file:line[:column]:content` (content is discarded).
 - fallback to VS Code's "Quick Open" input box if file not found.  (For handy custom search, or find containing files if the path is a folder in the workspace.)
+- include a simple "Open file like this file" command to call Quick Open with current file's relative path (without file extension), for lookup files like it.
 
 ## Path Lookup Detail
 
