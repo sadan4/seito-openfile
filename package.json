@@ -38,7 +38,8 @@
         "keybindings": [
             {
                 "command": "seito-openfile.openFileFromText",
-                "key": "alt+p"
+                "key": "alt+p",
+                "when": "editorTextFocus"
             },
             {
                 "command": "seito-openfile.openFileLikeThisFile",
