@@ -88,7 +88,7 @@ export class OpenFileFromText {
 		let leadingPathMapping = ConfigHandler.Instance.Configuration.LeadingPathMapping;
 		let leadingPaths = Object.keys(leadingPathMapping);
 		let i = leadingPaths.length;
-		for (; --i > 0; ) {	    // need to loop backward
+		for (; i-- > 0; ) {	    // need to loop backward
 			let leadingPath = leadingPaths[i];
 			if (tempInputPathWithoutLeadingSlash.startsWith(leadingPath /*this.trimPathSeparator(leadingPath)*/) &&
 					(tempInputPathWithoutLeadingSlash.length == leadingPath.length || tempInputPathWithoutLeadingSlash[leadingPath.length] == '/') ) {
@@ -96,7 +96,9 @@ export class OpenFileFromText {
 				let remainPath = tempInputPathWithoutLeadingSlash.substr(leadingPath.length);	// cut leadingPath
 				if (mappedPath == '')	// delete folder levels
 					remainPath = this.trimPathSeparator(remainPath);
-				inputPath = (isSlashAbsolutePath ? '/' : '') + mappedPath + remainPath;		// remainPath must either be empty or start with '/', as checked above
+				let newPath = (isSlashAbsolutePath ? '/' : '') + mappedPath + remainPath;		// remainPath must either be empty or start with '/', as checked above
+				debug(inputPath + " --> translated to --> " + newPath);
+				inputPath = newPath;
 				break;
 			}
 		}

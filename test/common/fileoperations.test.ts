@@ -236,5 +236,18 @@ suite("File operation Tests", () => {
 		assert.equal(res, "");
 	});
 
+	test("resolvePath, resolve path with path substitution by leadingPathMapping", () => {
+		ConfigHandler.Instance.Configuration.LeadingPathMapping = { '@dir1': 'test/dir1' };
+		let res = openFile.resolvePath("@dir1/testcase2", "d:/Temp/test.ts");
+		assert.equal(res, "d:\\Temp\\test\\dir1\\testcase2.ts");
+	});
+	test("Github #9: resolvePath, resolve path with deletion by leadingPathMapping. Support open paths from git diff which starts with a/ or b/", () => {
+		ConfigHandler.Instance.Configuration.LeadingPathMapping = { 'a': '', 'b': '' };
+		let res = openFile.resolvePath("a/test/testcase.txt", "d:/Temp/test.ts");
+		assert.equal(res, "d:\\Temp\\test\\testcase.txt");
+		res = openFile.resolvePath("b/test/testcase.txt", "d:/Temp/test.ts");
+		assert.equal(res, "d:\\Temp\\test\\testcase.txt");
+	});
+
 });
 
