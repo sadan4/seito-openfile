@@ -65,6 +65,14 @@ export class ConfigHandler
 			{
 				this.m_configuration.LookupTildePathAlsoFromWorkspace = config.get("lookupTildePathAlsoFromWorkspace") as boolean;
 			}
+			if( config.has("leadingPathMapping") === true )
+			{
+				this.m_configuration.LeadingPathMapping = config.get("leadingPathMapping") as { [ leadingPath : string ] : string };
+			}
+			if( config.has("notFoundTriggerQuickOpen") === true )
+			{
+				this.m_configuration.NotFoundTriggerQuickOpen = config.get("notFoundTriggerQuickOpen") as boolean;
+			}
 		}
 	}
 }

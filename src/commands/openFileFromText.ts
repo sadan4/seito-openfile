@@ -27,18 +27,30 @@ export class OpenFileFromText {
 		this.editor = vscode.window.activeTextEditor;
 	}
 
+	public trimPathSeparator(path : string) {
+		return path.replace(/^[\/\\\\]+|[\/\\\\]+$/g, '');
+	}
+
 	public execute() {
 		let numSelections = this.editor.selections.length;
-		let openForceNewTab = numSelections > 1;	// if there are more than 1 file to open, open in new tab for all.
+		let isOpeningMultipleFiles = numSelections > 1;	// if there are more than 1 file to open, open in new tab for all.
 		for (let i: number = 0; i < numSelections; i++) {
 			let words = this.getWordRanges(this.editor.selections[i]);
-			if (!openForceNewTab && words.length > 1)
-				openForceNewTab = true;
+			if (!isOpeningMultipleFiles && words.length > 1)
+				isOpeningMultipleFiles = true;
+			let openForceNewTab = isOpeningMultipleFiles;
 			for (let word of words) {
 				this.openDocument(word, openForceNewTab).then(path => {
 					console.log("Execute command", word + ': Path found:', path);
 				}).catch(error => {
 					console.log("Execute command", word + ':', error);
+					if (!isOpeningMultipleFiles && ConfigHandler.Instance.Configuration.NotFoundTriggerQuickOpen) {
+						// Note it is safe below to cut prefix '/' to make the absolute path relative, because if it is an absolute path and file exists, it should have opened directly.
+						vscode.commands.executeCommand(
+							'workbench.action.quickOpen',
+							this.trimPathSeparator(word) 	// trim / and \ from both ends of file string
+						);
+					}
 				});
 			}
 		}
@@ -68,18 +80,38 @@ export class OpenFileFromText {
 		// Normalize \ to / in the file string (\ not work for existsSync on linux-like), to support e.g. "use namespace\Class;" with path path/to/class/namespace/Class.php in PHP.
 		inputPath = inputPath.replace(/\\/g, '/');
 
+		let isAbsolutePath = isAbsolute(inputPath);
+		let isSlashAbsolutePath = isAbsolutePath && inputPath.match(/^[\/\\][^\/\\]/);
+
+		// translate path inputPath with "leadingPathMapping"
+		let tempInputPathWithoutLeadingSlash = isSlashAbsolutePath ? inputPath.substr(1) : inputPath;	// for temporary match with leadingPaths only
+		let leadingPathMapping = ConfigHandler.Instance.Configuration.LeadingPathMapping;
+		let leadingPaths = Object.keys(leadingPathMapping);
+		let i = leadingPaths.length;
+		for (; --i > 0; ) {	    // need to loop backward
+			let leadingPath = leadingPaths[i];
+			if (tempInputPathWithoutLeadingSlash.startsWith(leadingPath /*this.trimPathSeparator(leadingPath)*/) &&
+					(tempInputPathWithoutLeadingSlash.length == leadingPath.length || tempInputPathWithoutLeadingSlash[leadingPath.length] == '/') ) {
+				let mappedPath = this.trimPathSeparator(leadingPathMapping[leadingPath]);
+				let remainPath = tempInputPathWithoutLeadingSlash.substr(leadingPath.length);	// cut leadingPath
+				if (mappedPath == '')	// delete folder levels
+					remainPath = this.trimPathSeparator(remainPath);
+				inputPath = (isSlashAbsolutePath ? '/' : '') + mappedPath + remainPath;		// remainPath must either be empty or start with '/', as checked above
+				break;
+			}
+		}
+
 		// First, try relative to current document's folder, or absolute path, or relative to "~"
 		let p = FileOperations.getAbsoluteFromRelativePath(inputPath, basePath, true);
 		if (existsSync(p) && lstatSync(p).isFile())
 			return p;
 
 		let isHomePath = inputPath[0] === "~";
-		let isAbsolutePath = isAbsolute(inputPath);
 		let tryWorkspaceHomePath = false;
 		if (isHomePath && ConfigHandler.Instance.Configuration.LookupTildePathAlsoFromWorkspace)
 			tryWorkspaceHomePath = true;
 		if ( (isHomePath && !tryWorkspaceHomePath) ||
-				(isAbsolutePath && !inputPath.match(/^[\/\\][^\/\\]/)) ) { // only relative path (or absolute path start with single slash/backslash, not C: drive) can continue to lookup from other folders
+				(isAbsolutePath && !isSlashAbsolutePath) ) { // only relative path (or absolute path start with single slash/backslash, not C: drive) can continue to lookup from other folders
 			return '';
 		}
 
