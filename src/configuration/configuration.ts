@@ -13,7 +13,7 @@ export class Configuration
 
 	public constructor()
 	{
-		this.m_bound = new RegExp("[\\s\\\"\\\'\\>\\<#]");
+		this.m_bound = new RegExp("[\\s\\\"\\\'\\>\\<#;]");
 		this.m_extensions = new Array<string>();
 		this.m_extraExtensionsForTypes = {};
 		this.m_searchSubFoldersOfWorkspaceFolders = new Array<string>();
