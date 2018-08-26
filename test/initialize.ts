@@ -9,7 +9,7 @@ let files = [
 	{"name": "d:/Temp/test/_test3.scss", "content": ""},
 	{"name": "d:/Temp/test/testcase.txt", "content": "the first line\r\nthe second line\r\n\r\nthe forth line\r\n\r\nthe sixth line"},
 	{"name": "d:\\common\\test.ts", "content": ""},
-	{"name": "d:/Temp/test/dir1/testcase2.ts", "content": ""},
+	{"name": "d:/Temp/test/dir1/testcase2.ts", "content": "line 1"},
 	{"name": "d:/Temp/src/Class1.ts", "content": ""},
 ];
 

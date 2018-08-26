@@ -285,16 +285,17 @@ export class OpenFileFromText {
 		return '';
 	}
 
-	public getWordRanges(selection: vscode.Selection) {
+	public getWordRanges(selection: vscode.Selection, iDocument?: vscode.TextDocument) {
 		let line: string;
 		let start: vscode.Position;
+		let document = iDocument !== undefined ? iDocument : this.editor.document;
 		if (selection.isEmpty) {
-			line = this.editor.document.lineAt(selection.active.line).text;
+			line = document.lineAt(selection.active.line).text;
 			start = selection.active;
 			return [TextOperations.getWordBetweenBounds(line, start, this.configHandler.Configuration.Bound)];
 		}
 		else {
-			let multiLinesText = this.editor.document.getText(selection);
+			let multiLinesText = document.getText(selection);
 			let lines = multiLinesText.split(/\r\n?|\n/);
 			if (lines.length > 1 && lines[lines.length - 1] === '') {	// pop last extra empty line after the last newline char
 				lines.pop();

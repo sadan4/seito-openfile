@@ -249,5 +249,21 @@ suite("File operation Tests", () => {
 		assert.equal(res, "d:\\Temp\\test\\testcase.txt");
 	});
 
+	test("A multi-lined selection should split, and support cutting :content from lines of grep/ack output like file:line:column:content", (done) => {
+		let line1 = 'd:/Temp/test/testcase.txt:4:3:the forth line\n';
+		let line2 = 'd:/Temp/test/dir1/testcase2.ts:1:line 1\n';
+		let content = line1 + line2;
+		vscode.workspace.openTextDocument({ content: content }).then((doc) => {
+			let anchor = new vscode.Position(0, 0);
+			let active = new vscode.Position(2, 0);
+			let files = openFile.getWordRanges(new vscode.Selection(anchor, active), doc);
+			assert.equal(2, files.length);
+			assert.equal('d:/Temp/test/testcase.txt:4:3', files[0]);
+			assert.equal('d:/Temp/test/dir1/testcase2.ts:1', files[1]);
+			done();
+		}, (reason: Error) => {
+			done("Cannot open untitled text: " + reason.message);
+		});
+	});
 });
 
