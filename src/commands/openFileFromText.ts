@@ -67,11 +67,14 @@ export class OpenFileFromText {
 	 * @param inputPath text to deduce path from
 	 * @return empty string if not found
 	 */
-	public resolvePath(inputPath: string): string {
+	public resolvePath(inputPath: string, iCurrentDocFileName?: string): string {
 		let debug = (...args) => {
 			// console.log(...args);		// un-comment this to debug
 		};
-		let currentDocFileName = this.editor ? this.editor.document.fileName : '';
+		let currentDocUri : vscode.Uri = this.editor ? this.editor.document.uri : null;
+		if (iCurrentDocFileName !== undefined)
+			currentDocUri = vscode.Uri.file(iCurrentDocFileName);
+		let currentDocFileName = currentDocUri ? currentDocUri.fsPath : '';
 		let basePath = dirname(currentDocFileName);
 
 		// Normalize \ to / in the file string (\ not work for existsSync on linux-like), to support e.g. "use namespace\Class;" with path path/to/class/namespace/Class.php in PHP.
@@ -85,7 +88,7 @@ export class OpenFileFromText {
 		let leadingPathMapping = ConfigHandler.Instance.Configuration.LeadingPathMapping;
 		let leadingPaths = Object.keys(leadingPathMapping);
 		let i = leadingPaths.length;
-		for (; --i > 0; ) {	    // need to loop backward
+		for (; i-- > 0; ) {	    // need to loop backward
 			let leadingPath = leadingPaths[i];
 			if (tempInputPathWithoutLeadingSlash.startsWith(leadingPath /*this.trimPathSeparator(leadingPath)*/) &&
 					(tempInputPathWithoutLeadingSlash.length == leadingPath.length || tempInputPathWithoutLeadingSlash[leadingPath.length] == '/') ) {
@@ -93,7 +96,9 @@ export class OpenFileFromText {
 				let remainPath = tempInputPathWithoutLeadingSlash.substr(leadingPath.length);	// cut leadingPath
 				if (mappedPath == '')	// delete folder levels
 					remainPath = this.trimPathSeparator(remainPath);
-				inputPath = (isSlashAbsolutePath ? '/' : '') + mappedPath + remainPath;		// remainPath must either be empty or start with '/', as checked above
+				let newPath = (isSlashAbsolutePath ? '/' : '') + mappedPath + remainPath;		// remainPath must either be empty or start with '/', as checked above
+				debug(inputPath + " --> translated to --> " + newPath);
+				inputPath = newPath;
 				break;
 			}
 		}
@@ -134,8 +139,8 @@ export class OpenFileFromText {
 		let isWithinAWorkspaceFolder = false;
 		let currentWorkspaceFolderObj = null;
 		let currentWorkspaceFolder = null;
-		if (this.m_currFile && this.m_currFile.scheme === 'file') {
-			currentWorkspaceFolderObj = vscode.workspace.getWorkspaceFolder(this.m_currFile);
+		if (currentDocUri && currentDocUri.scheme === 'file') {
+			currentWorkspaceFolderObj = vscode.workspace.getWorkspaceFolder(currentDocUri);
 			if (currentWorkspaceFolderObj) {
 				isWithinAWorkspaceFolder = true;
 				currentWorkspaceFolder = currentWorkspaceFolderObj.uri.fsPath;
@@ -192,7 +197,7 @@ export class OpenFileFromText {
 
 			// Search some subfolders under the workspace folder
 			// let workspaceSubFolders = ["lib", "src", "app", "class", "module", "inc", "vendor", "public"]; // "class*", "module*", "inc*"
-			let subFoldersPattern = this.configHandler.Configuration.SearchSubFoldersOfWorkspaceFolders; // default: "@(lib*|src|app|class*|module*|inc*|vendor?(s)|public)";
+			let subFoldersPattern = this.configHandler.Configuration.SearchSubFoldersOfWorkspaceFolders;
 			let workspaceSubFolders = glob.sync(subFoldersPattern, { cwd: workspaceFolder });
 
 			debug('Searching sub-folders of workspaceFolder', workspaceFolder, 'are', workspaceSubFolders.join(','));

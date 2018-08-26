@@ -10,23 +10,39 @@ import * as assert from 'assert';
 // as well as import your extension to test it
 import * as vscode from 'vscode';
 import {initialize, teardown} from '../initialize';
-import {writeFileSync, writeFile, unlink, unlinkSync, mkdirSync, open, rmdirSync, existsSync} from 'fs';
+import {writeFileSync, writeFile, unlink, unlinkSync, mkdirSync, open, rmdirSync, existsSync, lstatSync} from 'fs';
 import {FileOperations} from '../../src/common/fileoperations';
 import { OpenFileFromText } from '../../src/commands/openFileFromText';
 import { ConfigHandler } from '../../src/configuration/confighandler';
+var trueCasePathSync = require('true-case-path');
+ConfigHandler.preInitInstanceNotFollowingVsCodeSettings();
 
 // Defines a Mocha test suite to group tests of similar kind together
 let dirname = "d:/temp/test";
 let filename = "d:/temp/test/testcase.txt";
 let content = "the first line\r\nthe second line\r\n\r\nthe forth line\r\n\r\nthe sixth line";
+let openFile: OpenFileFromText;
 
 suite("File operation Tests", () => {
 
 	suiteSetup((done) => {
 		initialize().then(done, done);
+		openFile = new OpenFileFromText(vscode.window.activeTextEditor, ConfigHandler.Instance);
 	});
 	suiteTeardown((done) => {
 		teardown().then(done, done);
+	});
+
+	test("** d:/Temp must exists before run tests, and match exact case", () => {
+		assert.equal(true, existsSync("d:/Temp"));
+		assert.equal(true, lstatSync("d:/Temp").isDirectory());
+		assert.equal("d:\\Temp", trueCasePathSync("d:/Temp"));
+	});
+	test("AlwaysRelToAbsPath 1", () => {
+		let rel1 = "../../common/test.ts";
+		let curr1 = "d:\\Temp\\test\\";
+		let res = FileOperations.getAbsoluteFromAlwaysRelativePath(rel1, curr1);
+		assert.equal(res, "d:\\common\\test.ts");
 	});
 
 	test("RelToAbsPath 1", () => {
@@ -133,11 +149,14 @@ suite("File operation Tests", () => {
 		assert.equal(res, "d:\\Temp\\test\\_test3.scss");
 	});
 	test("Github #6: Open with line number", (done) => {
-		let configHandler: ConfigHandler = ConfigHandler.Instance;
-		let openFile: OpenFileFromText = new OpenFileFromText(
-				vscode.window.activeTextEditor, configHandler);
-		openFile.openDocument("d:/TEMP/test/testcase.txt:2").then(value => {
-			assert.equal(vscode.window.activeTextEditor.document.fileName,"d:\\TEMP\\test\\testcase.txt");
+		// Remark: "d:/Temp" folder must exists before running unit tests.  And the letter case of "Temp" folder must be exact match.
+		openFile.openDocument("d:/Temp/test/testcase.txt:2").then(value => {
+			assert.equal(vscode.window.activeTextEditor.document.fileName,"d:\\Temp\\test\\testcase.txt");
+
+			// check line is positioned
+			let selections = vscode.window.activeTextEditor.selections;
+			assert.equal(1, selections.length);
+			assert.equal(1, selections[0].anchor.line);
 			console.log(value);
 			done();
 		}).catch(value => {
@@ -145,5 +164,90 @@ suite("File operation Tests", () => {
 			done(value);
 		});
 	});
+	test("Open with line number and column", (done) => {
+		// Remark: "d:/Temp" folder must exists before running unit tests.  And the letter case of "Temp" folder must be exact match.
+		openFile.openDocument("d:/Temp/test/testcase.txt:2:5").then(value => {
+			assert.equal(vscode.window.activeTextEditor.document.fileName,"d:\\Temp\\test\\testcase.txt");
+
+			// check line and column is positioned
+			let selections = vscode.window.activeTextEditor.selections;
+			assert.equal(1, selections.length);
+			assert.equal(1, selections[0].anchor.line);
+			assert.equal(4, selections[0].anchor.character);
+			console.log(value);
+			done();
+		}).catch(value => {
+			console.log(value);
+			done(value);
+		});
+	});
+
+	test("resolvePath, resolve path to absolute", () => {
+		let res = openFile.resolvePath("d:/Temp/test.ts", "d:/common/test.ts");
+		assert.equal(res, "d:\\Temp\\test.ts");
+	});
+	test("resolvePath, resolve path to home", () => {
+		let res = openFile.resolvePath("~/Desktop/desktop.ini", "d:/common/test.ts");
+		let pos = res.lastIndexOf('\\');
+		assert.equal(pos != -1 ? res.substr(pos) : res, "\\desktop.ini");
+	});
+	test("resolvePath, resolve path to same folder, without file extension, implicit file extension", () => {
+		let res = openFile.resolvePath("testcase2", "d:/Temp/test/dir1/testcase2.ts");
+		assert.equal(res, "d:\\Temp\\test\\dir1\\testcase2.ts");
+	});
+	test("resolvePath, resolve path to same folder, fuzzy, extraExtensions", () => {
+		ConfigHandler.Instance.Configuration.ExtraExtensionsForTypes = { "js": ["ts"] };
+		let res = openFile.resolvePath("testcase2", "d:/Temp/test/dir1/testcase2.js"); // Note .js instead of .ts here
+		assert.equal(res, "d:\\Temp\\test\\dir1\\testcase2.ts");
+	});
+	test("resolvePath, resolve path to same folder, not in workspace, without file extension, not resolved to directory", () => {
+		let res = openFile.resolvePath("../Temp/test", "d:/common/test.ts");
+		assert.equal(res, "d:\\Temp\\test.ts");
+	});
+	test("resolvePath, treat absolute path also as relative path, resolve path to same folder, without file extension", () => {
+		let res = openFile.resolvePath("/testcase2", "d:/Temp/test/dir1/testcase2.ts");
+		assert.equal(res, "d:\\Temp\\test\\dir1\\testcase2.ts");
+	});
+	test("resolvePath, resolve path to workspace folder", () => {
+		let res = openFile.resolvePath("test/hans.txt", "d:/common/test.ts");
+		assert.equal(res, "d:\\Temp\\test\\hans.txt");
+	});
+	test("resolvePath, resolve path to parent folder", () => {
+		let res = openFile.resolvePath("test.scss", "d:/Temp/test/dir1/testcase2.ts");
+		assert.equal(res, "d:\\Temp\\test\\test.scss");
+	});
+	test("resolvePath, resolve path to workspace src folder, without file extension", () => {
+		ConfigHandler.Instance.Configuration.SearchSubFoldersOfWorkspaceFolders = ['lib/','src/'];
+		let res = openFile.resolvePath("Class1", "d:/Temp/test/dir1/testcase2.ts");
+		assert.equal(res, "d:\\Temp\\src\\Class1.ts");
+	});
+	test("resolvePath, resolve path to searchPaths", () => {
+		ConfigHandler.Instance.Configuration.SearchPaths = ['d:/'];
+		let res = openFile.resolvePath("common/test", "d:/Temp/test/dir1/testcase2.ts");
+		assert.equal(res, "d:\\common\\test.ts");
+	});
+	test("resolvePath, resolve path to 2nd item in searchPaths", () => {
+		ConfigHandler.Instance.Configuration.SearchPaths = ['d:/','d:/Temp/test/dir1'];
+		let res = openFile.resolvePath("testcase2", "d:/Temp/test.ts");
+		assert.equal(res, "d:\\Temp\\test\\dir1\\testcase2.ts");
+	});
+	test("resolvePath, resolve path failure gives empty string, and won't resolve absolute path to folder", () => {
+		let res = openFile.resolvePath("d:/Temp//test/dir1", "d:/common/test.ts");
+		assert.equal(res, "");
+	});
+
+	test("resolvePath, resolve path with path substitution by leadingPathMapping", () => {
+		ConfigHandler.Instance.Configuration.LeadingPathMapping = { '@dir1': 'test/dir1' };
+		let res = openFile.resolvePath("@dir1/testcase2", "d:/Temp/test.ts");
+		assert.equal(res, "d:\\Temp\\test\\dir1\\testcase2.ts");
+	});
+	test("Github #9: resolvePath, resolve path with deletion by leadingPathMapping. Support open paths from git diff which starts with a/ or b/", () => {
+		ConfigHandler.Instance.Configuration.LeadingPathMapping = { 'a': '', 'b': '' };
+		let res = openFile.resolvePath("a/test/testcase.txt", "d:/Temp/test.ts");
+		assert.equal(res, "d:\\Temp\\test\\testcase.txt");
+		res = openFile.resolvePath("b/test/testcase.txt", "d:/Temp/test.ts");
+		assert.equal(res, "d:\\Temp\\test\\testcase.txt");
+	});
+
 });
 
