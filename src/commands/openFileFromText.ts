@@ -288,7 +288,7 @@ export class OpenFileFromText {
 	public getWordRanges(selection: vscode.Selection) {
 		let line: string;
 		let start: vscode.Position;
-		if (this.editor.selection.isEmpty) {
+		if (selection.isEmpty) {
 			line = this.editor.document.lineAt(selection.active.line).text;
 			start = selection.active;
 			return [TextOperations.getWordBetweenBounds(line, start, this.configHandler.Configuration.Bound)];
