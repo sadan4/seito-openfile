@@ -62,6 +62,46 @@ export class OpenFileFromText {
 		return [...new Set([].concat(...valuesArrays))];
 	}
 
+	public rewritePathWithLeadingPathMapping(inputPath: string, isSlashAbsolutePath : boolean) : string {
+		let tempInputPathWithoutLeadingSlash = isSlashAbsolutePath ? inputPath.substr(1) : inputPath;	// for temporary match with leadingPaths only
+		let leadingPathMapping = ConfigHandler.Instance.Configuration.LeadingPathMapping;
+		let leadingPaths = Object.keys(leadingPathMapping);
+		let i = leadingPaths.length;
+		for (; i-- > 0; ) {	    // need to loop backward
+			let leadingPath = leadingPaths[i];
+			let isEndWithStar = leadingPath.endsWith('*');
+			let isPrefix = tempInputPathWithoutLeadingSlash.startsWith(isEndWithStar ? leadingPath.substr(0, leadingPath.length - 1) : leadingPath);
+			let isMatchedLeadingPath = false;
+			let lengthOfMatch = leadingPath.length;
+			let stringStarExpandTo : string = undefined;
+			if (isPrefix) {
+				if (isEndWithStar) {
+					isMatchedLeadingPath = true;
+					lengthOfMatch -= 1;	// decrement for the tailing '*'
+					let i = lengthOfMatch;
+					while (i < tempInputPathWithoutLeadingSlash.length && tempInputPathWithoutLeadingSlash[i] != '/') {
+						++i;
+					}
+					stringStarExpandTo = tempInputPathWithoutLeadingSlash.substr(lengthOfMatch, i - lengthOfMatch);
+					lengthOfMatch = i;
+				} else {
+					isMatchedLeadingPath = (tempInputPathWithoutLeadingSlash.length == lengthOfMatch || tempInputPathWithoutLeadingSlash[lengthOfMatch] == '/');
+				}
+			}
+			if (isMatchedLeadingPath) {
+				let mappedPath = this.trimPathSeparator(leadingPathMapping[leadingPath]);
+				let remainPath = tempInputPathWithoutLeadingSlash.substr(lengthOfMatch);	// cut the match to leadingPath
+				if (mappedPath == '')	// delete folder levels
+					remainPath = this.trimPathSeparator(remainPath);
+				else if (isEndWithStar)
+					mappedPath = mappedPath.replace('*', stringStarExpandTo);	// expand a '*' if it exists.
+				let newPath = (isSlashAbsolutePath ? '/' : '') + mappedPath + remainPath;		// remainPath must either be empty or start with '/', as checked above
+				return newPath;
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Resolve path from the text at cursor.
 	 * @param inputPath text to deduce path from
@@ -84,23 +124,10 @@ export class OpenFileFromText {
 		let isSlashAbsolutePath = isAbsolutePath && inputPath.match(/^[\/\\][^\/\\]/);
 
 		// translate path inputPath with "leadingPathMapping"
-		let tempInputPathWithoutLeadingSlash = isSlashAbsolutePath ? inputPath.substr(1) : inputPath;	// for temporary match with leadingPaths only
-		let leadingPathMapping = ConfigHandler.Instance.Configuration.LeadingPathMapping;
-		let leadingPaths = Object.keys(leadingPathMapping);
-		let i = leadingPaths.length;
-		for (; i-- > 0; ) {	    // need to loop backward
-			let leadingPath = leadingPaths[i];
-			if (tempInputPathWithoutLeadingSlash.startsWith(leadingPath /*this.trimPathSeparator(leadingPath)*/) &&
-					(tempInputPathWithoutLeadingSlash.length == leadingPath.length || tempInputPathWithoutLeadingSlash[leadingPath.length] == '/') ) {
-				let mappedPath = this.trimPathSeparator(leadingPathMapping[leadingPath]);
-				let remainPath = tempInputPathWithoutLeadingSlash.substr(leadingPath.length);	// cut leadingPath
-				if (mappedPath == '')	// delete folder levels
-					remainPath = this.trimPathSeparator(remainPath);
-				let newPath = (isSlashAbsolutePath ? '/' : '') + mappedPath + remainPath;		// remainPath must either be empty or start with '/', as checked above
-				debug(inputPath + " --> translated to --> " + newPath);
-				inputPath = newPath;
-				break;
-			}
+		let newPath = this.rewritePathWithLeadingPathMapping(inputPath, !!isSlashAbsolutePath);
+		if (newPath !== null) {
+			debug(inputPath + " --> translated to --> " + newPath);
+			inputPath = newPath;
 		}
 
 		// First, try relative to current document's folder, or absolute path, or relative to "~"
