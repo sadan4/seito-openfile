@@ -9,11 +9,20 @@ export class ConfigHandler
 	private static m_instance: ConfigHandler;
 	private m_configuration: Configuration;
 
-	public constructor()
+	public constructor(shouldFollowVsCodeSettings : boolean = true)
 	{
 		this.m_configuration = new Configuration();
-		this.onConfigChanged();
-		vscode.workspace.onDidChangeConfiguration(this.onConfigChanged, this);
+		if (shouldFollowVsCodeSettings) {
+			this.onConfigChanged();
+			vscode.workspace.onDidChangeConfiguration(this.onConfigChanged, this);
+		}
+	}
+
+	// for unit test not to be affected by current user's settings
+	static preInitInstanceNotFollowingVsCodeSettings() {
+		// if (this.m_instance)
+		// 	return;
+		this.m_instance = new this(false);
 	}
 
 	static get Instance(): ConfigHandler
@@ -55,6 +64,14 @@ export class ConfigHandler
 			if( config.has("lookupTildePathAlsoFromWorkspace") === true )
 			{
 				this.m_configuration.LookupTildePathAlsoFromWorkspace = config.get("lookupTildePathAlsoFromWorkspace") as boolean;
+			}
+			if( config.has("leadingPathMapping") === true )
+			{
+				this.m_configuration.LeadingPathMapping = config.get("leadingPathMapping") as { [ leadingPath : string ] : string };
+			}
+			if( config.has("notFoundTriggerQuickOpen") === true )
+			{
+				this.m_configuration.NotFoundTriggerQuickOpen = config.get("notFoundTriggerQuickOpen") as boolean;
 			}
 		}
 	}

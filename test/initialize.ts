@@ -1,6 +1,6 @@
 import {writeFileSync, writeFile, unlink, unlinkSync, mkdirSync, rmdirSync, existsSync} from 'fs';
 
-let dirnames = ["d:\\Temp\\test", "d:/common"];
+let dirnames = ["d:\\Temp\\test", "d:\\Temp\\test\\dir1", "d:\\Temp\\src", "d:/common"];
 let files = [
 	{"name": "d:\\Temp\\test.ts", "content": ""},
 	{"name": "d:/Temp/test/hans.txt", "content": ""},
@@ -9,6 +9,8 @@ let files = [
 	{"name": "d:/Temp/test/_test3.scss", "content": ""},
 	{"name": "d:/Temp/test/testcase.txt", "content": "the first line\r\nthe second line\r\n\r\nthe forth line\r\n\r\nthe sixth line"},
 	{"name": "d:\\common\\test.ts", "content": ""},
+	{"name": "d:/Temp/test/dir1/testcase2.ts", "content": "line 1"},
+	{"name": "d:/Temp/src/Class1.ts", "content": ""},
 ];
 
 export function initialize(): Promise<any>

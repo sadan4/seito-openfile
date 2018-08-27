@@ -28,8 +28,24 @@
                 "command": "seito-openfile.openFileFromText",
                 "category": "File",
                 "title": "Open file under cursor"
+            },
+            {
+                "command": "seito-openfile.openFileLikeThisFile",
+                "category": "File",
+                "title": "Open file like this file"
             }
         ],
+        "keybindings": [
+            {
+                "command": "seito-openfile.openFileFromText",
+                "key": "alt+p",
+                "when": "editorTextFocus"
+            },
+            {
+                "command": "seito-openfile.openFileLikeThisFile",
+                "key": "alt+q"
+            }
+          ],
         "menus": {
             "commandPalette": [
                 {
@@ -66,12 +82,14 @@
                 "seito-openfile.extraExtensionsForTypes": {
                     "type": "object",
                     "default": {
-                        "js": [
-                            "jsx"
-                        ],
-                        "jsx": [
-                            "js"
-                        ]
+                        "js": ["jsx"],
+                        "jsx": ["js"],
+                        "ts": ["js", "jsx"],
+                        "vue": ["js", "jsx"],
+                        "c": ["h"],
+                        "cpp": ["h", "hpp"],
+                        "m": ["h"],
+                        "mm": ["h", "hpp"]
                     },
                     "description": "Known suffixes to look for when file string has no suffix, according to current document's type. (suffix match is relative to current document's parent folders only)"
                 },
@@ -98,6 +116,16 @@
                     "type": "array",
                     "default": [],
                     "description": "Paths to be added to search at last, for relative paths"
+                },
+                "seito-openfile.leadingPathMapping": {
+                    "type": "object",
+                    "default": { },
+                    "description": "Rewrite leading path segments to another path, like {\"source/path\": \"target/path\"}.  Both source and target paths must be full match of single or multiple folder levels.  E.g. if want '@/' to mean relative to workspace, you may write {\"@\": \"\"} to remove the '@' folder level.  Be care any mistake of this setting can cause unexpected file open failures."
+                },
+                "seito-openfile.notFoundTriggerQuickOpen": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "When enabled, if (a sole) file is not found by the normal logic, trigger VS Code's Quick Open input box for further search."
                 }
             }
         }

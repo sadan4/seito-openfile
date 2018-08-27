@@ -58,7 +58,7 @@ export class TextOperations
 		if (lPos > -1) {
 			let numberAfterLastColon = parseInt(iWord.substring(lPos+1));	// use original parseInt, may not accurate and thus only limit start with number after colon
 			if( isNaN(numberAfterLastColon) ) {
-				fileAndLine.file = (iWord.length === lPos+1 ? iWord.substring(0,lPos) : iWord);	// FIXME: actually (iWord.length === lPos+1) never happen, because numberAfterLastColon == "" and isNaN("") === false
+				fileAndLine.file = (iWord.length === lPos+1 ? iWord.substring(0,lPos) : iWord);
 				fileAndLine.line = fileAndLine.column = -1;
 			} else {
 				let b4Num = lPos - 1;

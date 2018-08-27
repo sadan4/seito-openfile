@@ -4,6 +4,7 @@
 import * as vscode from 'vscode';
 import {ConfigHandler} from './configuration/confighandler';
 import {OpenFileFromText} from './commands/openFileFromText';
+import {OpenFileLikeThisFile} from './commands/openFileLikeThisFile';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -22,6 +23,9 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand('seito-openfile.openFileFromText', openFile.execute, openFile)
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand('seito-openfile.openFileLikeThisFile', OpenFileLikeThisFile.execute, OpenFileLikeThisFile)
     );
 }
 
