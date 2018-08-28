@@ -46,9 +46,10 @@ export class OpenFileFromText {
 					console.log("Execute command", word + ':', error);
 					if (!isOpeningMultipleFiles && this.configHandler.Configuration.NotFoundTriggerQuickOpen) {
 						// Note it is safe below to cut prefix '/' to make the absolute path relative, because if it is an absolute path and file exists, it should have opened directly.
+						let newWord = this.rewritePathWithLeadingPathMapping(word.replace(/\\/g, '/'), !!word.match(/^[\/\\][^\/\\]/));
 						vscode.commands.executeCommand(
 							'workbench.action.quickOpen',
-							this.trimPathSeparator(word) 	// trim / and \ from both ends of file string
+							this.trimPathSeparator(newWord) 	// trim / and \ from both ends of file string
 						);
 					}
 				});
