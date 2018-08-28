@@ -12,15 +12,15 @@ var trueCasePathSync = require('true-case-path');
 
 
 export class OpenFileFromText {
-	private m_currFile: vscode.Uri;
+	// private m_currFile: vscode.Uri;	// Just use this.editor.document.uri.  vscode.TextEditor's document will never be null.
 
 	public constructor(private editor: vscode.TextEditor,
 		private configHandler: ConfigHandler) {
-		if (editor &&
+		/* if (editor &&
 			editor.document &&
 			editor.document.uri) {
 			this.m_currFile = editor.document.uri;
-		}
+		} */
 	}
 
 	public onChangeEditor() {
@@ -44,7 +44,7 @@ export class OpenFileFromText {
 					console.log("Execute command", word + ': Path found:', path);
 				}).catch(error => {
 					console.log("Execute command", word + ':', error);
-					if (!isOpeningMultipleFiles && ConfigHandler.Instance.Configuration.NotFoundTriggerQuickOpen) {
+					if (!isOpeningMultipleFiles && this.configHandler.Configuration.NotFoundTriggerQuickOpen) {
 						// Note it is safe below to cut prefix '/' to make the absolute path relative, because if it is an absolute path and file exists, it should have opened directly.
 						vscode.commands.executeCommand(
 							'workbench.action.quickOpen',
@@ -64,7 +64,7 @@ export class OpenFileFromText {
 
 	public rewritePathWithLeadingPathMapping(inputPath: string, isSlashAbsolutePath : boolean) : string {
 		let tempInputPathWithoutLeadingSlash = isSlashAbsolutePath ? inputPath.substr(1) : inputPath;	// for temporary match with leadingPaths only
-		let leadingPathMapping = ConfigHandler.Instance.Configuration.LeadingPathMapping;
+		let leadingPathMapping = this.configHandler.Configuration.LeadingPathMapping;
 		let leadingPaths = Object.keys(leadingPathMapping);
 		let i = leadingPaths.length;
 		for (; i-- > 0; ) {	    // need to loop backward
@@ -137,7 +137,7 @@ export class OpenFileFromText {
 
 		let isHomePath = inputPath[0] === "~";
 		let tryWorkspaceHomePath = false;
-		if (isHomePath && ConfigHandler.Instance.Configuration.LookupTildePathAlsoFromWorkspace)
+		if (isHomePath && this.configHandler.Configuration.LookupTildePathAlsoFromWorkspace)
 			tryWorkspaceHomePath = true;
 		if ( (isHomePath && !tryWorkspaceHomePath) ||
 				(isAbsolutePath && !isSlashAbsolutePath) ) { // only relative path (or absolute path start with single slash/backslash, not C: drive) can continue to lookup from other folders
@@ -159,7 +159,7 @@ export class OpenFileFromText {
 			let extraExtensions = [];
 			if (assumeExtWithoutDot in extensionsMap && isArray(extensionsMap[assumeExtWithoutDot]))
 				extraExtensions = [...extensionsMap[assumeExtWithoutDot]];
-			extensions = this.mergeDeduplicate(extensions, extraExtensions, ConfigHandler.Instance.Configuration.Extensions);
+			extensions = this.mergeDeduplicate(extensions, extraExtensions, this.configHandler.Configuration.Extensions);
 		}
 
 		// Find which workspace folder current editing document is in.  only lookup parents folders if isWithinAWorkspaceFolder

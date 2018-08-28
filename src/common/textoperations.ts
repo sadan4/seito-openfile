@@ -5,6 +5,7 @@ import { ConfigHandler } from '../configuration/confighandler';
 
 export class TextOperations
 {
+	/** @deprecated.  Now can use document.lineAt() in OpenFileFromText#getWordRanges. */
 	public static getCurrentLine(iText: string, iLine: number): string
 	{
 		if( iText === undefined || iText === "" )
