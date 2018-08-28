@@ -49,7 +49,7 @@ export class OpenFileFromText {
 						let newWord = this.rewritePathWithLeadingPathMapping(word.replace(/\\/g, '/'), !!word.match(/^[\/\\][^\/\\]/));
 						vscode.commands.executeCommand(
 							'workbench.action.quickOpen',
-							this.trimPathSeparator(newWord) 	// trim / and \ from both ends of file string
+							this.trimPathSeparator(newWord !== null ? newWord : word) 	// trim / and \ from both ends of file string
 						);
 					}
 				});
