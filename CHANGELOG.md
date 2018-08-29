@@ -1,5 +1,12 @@
 ## Release Notes
 
+### 1.8.0
+
+**Thanks to @johnnytemp**
+- If file not found, default to trigger VS Code's "Quick Open" input box with pre-filled file path (for custom lookup or lookup of folder).
+- New setting "seito-openfile.leadingPathMapping" to rewrite leading path segments.
+- Add key binding Alt + P
+
 ### 1.7.0
 
 **Thanks to @johnnytemp** for his great work on the following features:
