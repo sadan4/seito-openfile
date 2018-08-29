@@ -253,6 +253,11 @@ suite("File operation Tests", () => {
 		let res = openFile.resolvePath("$test/dir1/testcase2", "d:/Temp/test.ts");
 		assert.equal(res, "d:\\Temp\\test\\dir1\\testcase2.ts");
 	});
+	test("resolvePath, resolve path with path substitution, using prefix match with ending '*', by leadingPathMapping's deletion, removing path's leading variable", () => {
+		ConfigHandler.Instance.Configuration.LeadingPathMapping = { "$*": "" };
+		let res = openFile.resolvePath("$basePath/test/dir1/testcase2", "d:/Temp/src/Class1.ts");
+		assert.equal(res, "d:\\Temp\\test\\dir1\\testcase2.ts");
+	});
 
 	test("A multi-lined selection should split, and support cutting :content from lines of grep/ack output like file:line:column:content", (done) => {
 		let line1 = 'd:/Temp/test/testcase.txt:4:3:the forth line\n';
