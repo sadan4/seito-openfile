@@ -9,7 +9,7 @@ import * as assert from 'assert';
 // You can import and use all API from the 'vscode' module
 // as well as import your extension to test it
 import * as vscode from 'vscode';
-import {initialize, teardown} from '../initialize';
+import {envSetup, envTeardown} from '../initialize';
 import {writeFileSync, writeFile, unlink, unlinkSync, mkdirSync, rmdirSync} from 'fs';
 import {TextOperations} from '../../src/common/textoperations';
 import {ConfigHandler} from '../../src/configuration/confighandler';
@@ -22,10 +22,7 @@ let content = "the first line\r\nthe second line\r\n\r\nthe forth line\r\n\r\nth
 suite("Text operation Tests", () => {
 
 	suiteSetup((done) => {
-		initialize().then(done, done);
-	});
-	suiteTeardown((done) => {
-		teardown().then(done, done);
+		envSetup().then(done);
 	});
 
 	test("Read second line", () => {
@@ -167,6 +164,5 @@ suite("Text operation Tests", () => {
 		assert.equal(res.line, "42");
 		assert.equal(res.column, "10");
 	});
-
 
 });

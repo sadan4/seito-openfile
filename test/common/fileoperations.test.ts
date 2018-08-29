@@ -9,7 +9,7 @@ import * as assert from 'assert';
 // You can import and use all API from the 'vscode' module
 // as well as import your extension to test it
 import * as vscode from 'vscode';
-import {initialize, teardown} from '../initialize';
+import {envSetup, envTeardown} from '../initialize';
 import {writeFileSync, writeFile, unlink, unlinkSync, mkdirSync, open, rmdirSync, existsSync, lstatSync} from 'fs';
 import {FileOperations} from '../../src/common/fileoperations';
 import { OpenFileFromText } from '../../src/commands/openFileFromText';
@@ -26,11 +26,8 @@ let openFile: OpenFileFromText;
 suite("File operation Tests", () => {
 
 	suiteSetup((done) => {
-		initialize().then(done, done);
 		openFile = new OpenFileFromText(vscode.window.activeTextEditor, ConfigHandler.Instance);
-	});
-	suiteTeardown((done) => {
-		teardown().then(done, done);
+		envSetup().then(done, done);
 	});
 
 	test("** d:/Unittests must exists before run tests, and match exact case", () => {
@@ -250,18 +247,18 @@ suite("File operation Tests", () => {
 	});
 	test("resolvePath, resolve path with path substitution, using prefix match with ending '*', by leadingPathMapping.", () => {
 		ConfigHandler.Instance.Configuration.LeadingPathMapping = { '$*': '*' };
-		let res = openFile.resolvePath("$test/dir1/testcase2", "d:/Temp/test.ts");
-		assert.equal(res, "d:\\Temp\\test\\dir1\\testcase2.ts");
+		let res = openFile.resolvePath("$test/dir1/testcase2", "d:/Unittests/test.ts");
+		assert.equal(res, "d:\\Unittests\\test\\dir1\\testcase2.ts");
 	});
 	test("resolvePath, resolve path with path substitution, using prefix match with ending '*', by leadingPathMapping's deletion, removing path's leading variable", () => {
 		ConfigHandler.Instance.Configuration.LeadingPathMapping = { "$*": "*", "$*?": "" };		// "$*?" is a special case, same as "$*", but for non-duplicated keys
-		let res = openFile.resolvePath("$basePath/test/dir1/testcase2", "d:/Temp/src/Class1.ts");
-		assert.equal(res, "d:\\Temp\\test\\dir1\\testcase2.ts");
+		let res = openFile.resolvePath("$basePath/test/dir1/testcase2", "d:/Unittests/src/Class1.ts");
+		assert.equal(res, "d:\\Unittests\\test\\dir1\\testcase2.ts");
 	});
 	test("resolvePath, resolve path with path substitution, using prefix match with ending '*', by leadingPathMapping, removing '$' for single variable", () => {
 		ConfigHandler.Instance.Configuration.LeadingPathMapping = { "$*": "*", "$*?": "" };		// "$*?" is a special case, same as "$*", but for non-duplicated keys. Later value in this leadingPathMapping has higher priority.  E.g. such that { "abc": "...", "abc/def": "..." } works better in natural order
-		let res = openFile.resolvePath("$class1", "d:/Temp/test/dir1/testcase2.ts");
-		assert.equal(res, "d:\\Temp\\src\\Class1.ts");
+		let res = openFile.resolvePath("$Class1", "d:/Unittests/test/dir1/testcase2.ts");
+		assert.equal(res, "d:\\Unittests\\src\\Class1.ts");
 	});
 
 	test("A multi-lined selection should split, and support cutting :content from lines of grep/ack output like file:line:column:content", (done) => {
@@ -280,5 +277,6 @@ suite("File operation Tests", () => {
 			done("Cannot open untitled text: " + reason.message);
 		});
 	});
+
 });
 

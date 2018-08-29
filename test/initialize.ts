@@ -13,37 +13,39 @@ let files = [
 	{"name": "d:/Unittests/src/Class1.ts", "content": ""},
 ];
 
-export function initialize(): Promise<any>
+export function envSetup(): Promise<any>
 {
 	return new Promise<any>((resolve, reject) => {
+		console.log("Initialize!")
 		try{
 			dirnames.forEach(dirname => {
 				if(!existsSync(dirname))
 					mkdirSync(dirname);
 			});
-			resolve();
 		}
 		catch(error)
 		{
-			console.error("Fehler: ", error);
+			console.error("Error mkdir: ", error);
 			reject();
 		}
 		try{
 			files.forEach(file => {
 				writeFileSync(file.name, file.content);
 			});
-			resolve();
 		}
 		catch(error)
 		{
-			//reject();
+			console.error("Error create file: ", error);
+			reject();
 		}
+		resolve();
 	});
 }
 
-export function teardown(): Promise<any>
+export function envTeardown(): Promise<any>
 {
 	return new Promise<any>((resolve, reject) => {
+		console.log("Teardown!");
 		try{
 			files.forEach(file => {
 				unlinkSync(file.name);
