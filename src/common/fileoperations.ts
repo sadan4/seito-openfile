@@ -25,7 +25,7 @@ export class FileOperations
 				return join(iPath);
 			else if( iCurrPath === "" ) // fault tolerant: only fail when not absolute or relative-to-home path, if iCurrPath is blank (fix some test case when activeTextEditor is null)
 				return "";
-			else if( !baseMustBeDir && statSync(iCurrPath).isFile )
+			else if( !baseMustBeDir && statSync(iCurrPath).isFile() )
 			{
 				iCurrPath = dirname(iCurrPath);
 			}
@@ -48,7 +48,7 @@ export class FileOperations
 
 		try
 		{
-			if( !baseMustBeDir && statSync(iCurrPath).isFile )
+			if( !baseMustBeDir && statSync(iCurrPath).isFile() )
 			{
 				iCurrPath = dirname(iCurrPath);
 			}
