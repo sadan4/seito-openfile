@@ -6,6 +6,10 @@
 - If file not found, default to trigger VS Code's "Quick Open" input box with pre-filled file path (for custom lookup or lookup of folder).
 - New setting "seito-openfile.leadingPathMapping" to rewrite leading path segments.
 - Add key binding Alt + P
+- leadingPathMapping's path rewrite also apply to Quick Open's text when file not found.
+- a mapping in leadingPathMapping is not applied if the whole file string is mapped to empty string.
+- support both delete "$var" from "$var/path/to/sth" and delete "$" from "$var" by setting leadingPathMapping = { "$*": "*", "$*?": "" }. ("$*?" is a special syntax same as "$*", but to avoid key duplication not allowed in syntax. Remark: later value, higher priority, which is the "$*?": "")
+
 
 ### 1.7.0
 
