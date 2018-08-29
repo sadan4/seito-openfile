@@ -69,7 +69,7 @@ export class OpenFileFromText {
 		let leadingPaths = Object.keys(leadingPathMapping);
 		let i = leadingPaths.length;
 		for (; i-- > 0; ) {	    // need to loop backward
-			let leadingPath = leadingPaths[i];
+			let leadingPath = leadingPaths[i].replace(/\*\?$/, '*');	// allow leadingPathMapping = { "$*": "*", "$*?": "" } to work.  Since a key "$*" cannot appear twice.
 			let isEndWithStar = leadingPath.endsWith('*');
 			let isPrefix = tempInputPathWithoutLeadingSlash.startsWith(isEndWithStar ? leadingPath.substr(0, leadingPath.length - 1) : leadingPath);
 			let isMatchedLeadingPath = false;
@@ -90,17 +90,16 @@ export class OpenFileFromText {
 				}
 			}
 			if (isMatchedLeadingPath) {
-				let mappedPath = this.trimPathSeparator(leadingPathMapping[leadingPath]);
+				let mappedPath = this.trimPathSeparator(leadingPathMapping[leadingPaths[i]]);
 				let remainPath = tempInputPathWithoutLeadingSlash.substr(lengthOfMatch);	// cut the match to leadingPath
 				if (mappedPath == '')	// delete folder levels
 					remainPath = this.trimPathSeparator(remainPath);
 				else if (isEndWithStar)
 					mappedPath = mappedPath.replace('*', stringStarExpandTo);	// expand a '*' if it exists.
 				let newPath = (isSlashAbsolutePath ? '/' : '') + mappedPath + remainPath;		// remainPath must either be empty or start with '/', as checked above
-				if (newPath === '') {
-					return null;		// improvement: if whole path is translated to empty string (may be deletion), such as "$variable" for leadingPathMapping = { "$*": "" }, it is better not translated.
+				if (newPath !== '') {
+					return newPath;		// improvement: if whole path is translated to empty string (may be deletion), such as "$variable" for leadingPathMapping = { "$*": "" }, it is better not accepted for this case to translated.  But continue the search.
 				}
-				return newPath;
 			}
 		}
 		return null;

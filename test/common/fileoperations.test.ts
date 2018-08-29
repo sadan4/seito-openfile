@@ -254,9 +254,14 @@ suite("File operation Tests", () => {
 		assert.equal(res, "d:\\Temp\\test\\dir1\\testcase2.ts");
 	});
 	test("resolvePath, resolve path with path substitution, using prefix match with ending '*', by leadingPathMapping's deletion, removing path's leading variable", () => {
-		ConfigHandler.Instance.Configuration.LeadingPathMapping = { "$*": "" };
+		ConfigHandler.Instance.Configuration.LeadingPathMapping = { "$*": "*", "$*?": "" };		// "$*?" is a special case, same as "$*", but for non-duplicated keys
 		let res = openFile.resolvePath("$basePath/test/dir1/testcase2", "d:/Temp/src/Class1.ts");
 		assert.equal(res, "d:\\Temp\\test\\dir1\\testcase2.ts");
+	});
+	test("resolvePath, resolve path with path substitution, using prefix match with ending '*', by leadingPathMapping, removing '$' for single variable", () => {
+		ConfigHandler.Instance.Configuration.LeadingPathMapping = { "$*": "*", "$*?": "" };		// "$*?" is a special case, same as "$*", but for non-duplicated keys. Later value in this leadingPathMapping has higher priority.  E.g. such that { "abc": "...", "abc/def": "..." } works better in natural order
+		let res = openFile.resolvePath("$class1", "d:/Temp/test/dir1/testcase2.ts");
+		assert.equal(res, "d:\\Temp\\src\\Class1.ts");
 	});
 
 	test("A multi-lined selection should split, and support cutting :content from lines of grep/ack output like file:line:column:content", (done) => {

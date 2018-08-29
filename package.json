@@ -120,7 +120,7 @@
                 "seito-openfile.leadingPathMapping": {
                     "type": "object",
                     "default": { },
-                    "description": "Rewrite leading path segments to another path, like {\"source/path\": \"target/path\"}.  Both source and target paths must be full match of single or multiple folder levels.  E.g. if want '@/' to mean relative to workspace, you may write {\"@\": \"\"} to remove the '@' folder level.  Also support ending wildcard '*', like {\"@*\": \"*\"}.  Be care any mistake of this setting can cause unexpected file open failures."
+                    "description": "Rewrite leading path segments to another path, like {\"source/path\": \"target/path\"}.  Both source and target paths must be full match of single or multiple folder levels.  E.g. if want '@/' to mean relative to workspace, you may write {\"@\": \"\"} to remove the '@' folder level.  Also support ending wildcard '*', like {\"@*\": \"*\"}.  Later value has higher precedence.  Be care any mistake of this setting can cause unexpected file open failures."
                 },
                 "seito-openfile.notFoundTriggerQuickOpen": {
                     "type": "boolean",
