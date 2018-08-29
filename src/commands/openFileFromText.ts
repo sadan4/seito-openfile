@@ -97,6 +97,9 @@ export class OpenFileFromText {
 				else if (isEndWithStar)
 					mappedPath = mappedPath.replace('*', stringStarExpandTo);	// expand a '*' if it exists.
 				let newPath = (isSlashAbsolutePath ? '/' : '') + mappedPath + remainPath;		// remainPath must either be empty or start with '/', as checked above
+				if (newPath === '') {
+					return null;		// improvement: if whole path is translated to empty string (may be deletion), such as "$variable" for leadingPathMapping = { "$*": "" }, it is better not translated.
+				}
 				return newPath;
 			}
 		}
