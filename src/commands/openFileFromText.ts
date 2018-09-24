@@ -213,7 +213,7 @@ export class OpenFileFromText {
 		let workspaceFolders = [];
 		if (isWithinAWorkspaceFolder)
 			workspaceFolders.push(currentWorkspaceFolderObj);
-		workspaceFolders = this.mergeDeduplicate(vscode.workspace.workspaceFolders || []);
+		workspaceFolders = this.mergeDeduplicate(workspaceFolders, vscode.workspace.workspaceFolders || []);
 		for (let workspaceFolderObj of workspaceFolders) {
 			let workspaceFolder = workspaceFolderObj.uri.fsPath;
 
