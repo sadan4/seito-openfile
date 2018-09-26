@@ -15,8 +15,8 @@ import {TextOperations} from '../../src/common/textoperations';
 import {ConfigHandler} from '../../src/configuration/confighandler';
 ConfigHandler.preInitInstanceNotFollowingVsCodeSettings();
 
-let dirname = "d:/temp/test";
-let filename = "d:/temp/test/testcase.txt";
+// let dirname = "d:/temp/test";
+// let filename = "d:/temp/test/testcase.txt";
 let content = "the first line\r\nthe second line\r\n\r\nthe forth line\r\n\r\nthe sixth line";
 
 suite("Text operation Tests", () => {
