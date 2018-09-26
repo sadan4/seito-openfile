@@ -1,5 +1,8 @@
 ## Release Notes
 
+### 1.8.1
+- minor bugfix in handling workspace folders (@johnnytemp)
+
 ### 1.8.0
 
 **Thanks to @johnnytemp**
