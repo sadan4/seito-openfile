@@ -1,5 +1,8 @@
 ## Release Notes
 
+### 1.8.2
+- added extension icon
+
 ### 1.8.1
 - minor bugfix in handling workspace folders (@johnnytemp)
 

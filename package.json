@@ -2,7 +2,7 @@
     "name": "seito-openfile",
     "displayName": "Open file",
     "description": "Extract a filepath from the current cursor position and open the file",
-    "version": "1.8.1",
+    "version": "1.8.2",
     "publisher": "Fr43nk",
     "engines": {
         "vscode": "^1.15.0"
@@ -10,6 +10,11 @@
     "categories": [
         "Other"
     ],
+    "icon": "programicon-2x.png",
+    "galleryBanner": {
+        "theme": "dark",
+        "color": "#782121"
+    },
     "homepage": "https://github.com/fr43nk/seito-openfile/blob/master/README.md",
     "bugs": {
         "url": "https://github.com/fr43nk/seito-openfile/issues"
