@@ -1,5 +1,13 @@
 ## Release Notes
 
+### 1.8.3
+- added configuration for open file in new persistent tab
+
+**New Configuration**
+```
+seito-openfile.openNewTab
+```
+
 ### 1.8.2
 - added extension icon
 
