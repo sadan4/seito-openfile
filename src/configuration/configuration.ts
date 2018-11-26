@@ -12,6 +12,7 @@ export class Configuration
 	private m_lookupTildePathAlsoFromWorkspace: boolean;
 	private m_leadingPathMapping: { [ leadingPath : string ] : string };
 	private m_notFoundTriggerQuickOpen: boolean;
+	private m_openNewTab: boolean;
 
 	public constructor()
 	{
@@ -23,6 +24,7 @@ export class Configuration
 		this.m_lookupTildePathAlsoFromWorkspace = true;
 		this.m_leadingPathMapping = {};
 		this.m_notFoundTriggerQuickOpen = true;
+		this.m_openNewTab = false;
 	}
 
 	get Bound(): RegExp
@@ -129,5 +131,16 @@ export class Configuration
 	get NotFoundTriggerQuickOpen(): boolean
 	{
 		return this.m_notFoundTriggerQuickOpen;
+	}
+
+	set OpenNewTab(yesNo: boolean)
+	{
+		if( yesNo !== undefined )
+			this.m_openNewTab = yesNo;
+	}
+
+	get OpenNewTab(): boolean
+	{
+		return this.m_openNewTab;
 	}
 }

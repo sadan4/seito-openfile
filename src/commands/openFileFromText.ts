@@ -1,6 +1,6 @@
 'use strict';
 
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
 import { dirname, extname, join, isAbsolute, basename } from 'path';
 import { existsSync, lstatSync } from 'fs';
 import { ConfigHandler } from '../configuration/confighandler';
@@ -38,7 +38,7 @@ export class OpenFileFromText {
 			let words = this.getWordRanges(this.editor.selections[i]);
 			if (!isOpeningMultipleFiles && words.length > 1)
 				isOpeningMultipleFiles = true;
-			let openForceNewTab = isOpeningMultipleFiles;
+			let openForceNewTab = isOpeningMultipleFiles || this.configHandler.Configuration.OpenNewTab;
 			for (let word of words) {
 				this.openDocument(word, openForceNewTab).then(path => {
 					console.log("Execute command", word + ': Path found:', path);
