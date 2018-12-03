@@ -1,5 +1,8 @@
 ## Release Notes
 
+### 1.8.4
+- changes related to security issues of library event-stream
+
 ### 1.8.3
 - added configuration for open file in new persistent tab
 

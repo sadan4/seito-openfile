@@ -2,7 +2,7 @@
   "name": "seito-openfile",
   "displayName": "Open file",
   "description": "Extract a filepath from the current cursor position and open the file",
-  "version": "1.8.3",
+  "version": "1.8.4",
   "publisher": "Fr43nk",
   "engines": {
     "vscode": "^1.15.0"
@@ -175,6 +175,6 @@
   "dependencies": {
     "glob-all": "^3.1.0",
     "true-case-path": "^1.0.0",
-    "vscode": "^1.1.21"
+    "vscode": "^1.1.22"
   }
 }
