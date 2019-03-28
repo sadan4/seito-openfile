@@ -1,5 +1,8 @@
 ## Release Notes
 
+### 1.8.5
+- moved repository to gitlab
+
 ### 1.8.4
 - changes related to security issues of library event-stream
 
