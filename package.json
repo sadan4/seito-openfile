@@ -24,7 +24,8 @@
     "url": "https://gitlab.com/fr43nk/seito-openfile.git"
   },
   "activationEvents": [
-    "*"
+    "onCommand:seito-openfile.openFileFromText",
+    "onCommand:seito-openfile.openFileLikeThisFile"
   ],
   "main": "./out/src/extension",
   "contributes": {
