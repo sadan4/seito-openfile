@@ -1,12 +1,13 @@
 'use strict';
 
 import * as vscode from 'vscode';
+import { Suffix } from '../types/suffix.type';
 
 export class Configuration
 {
 	private m_bound: RegExp;
 	private m_extensions: Array<string>;
-	private m_extraExtensionsForTypes: object;
+	private m_extraExtensionsForTypes: Suffix[];
 	private m_searchSubFoldersOfWorkspaceFolders: Array<string>;
 	private m_searchPaths: Array<string>;
 	private m_lookupTildePathAlsoFromWorkspace: boolean;
@@ -18,7 +19,7 @@ export class Configuration
 	{
 		this.m_bound = new RegExp("[\\s\\\"\\\'\\>\\<#;]");
 		this.m_extensions = new Array<string>();
-		this.m_extraExtensionsForTypes = {};
+		this.m_extraExtensionsForTypes = [];
 		this.m_searchSubFoldersOfWorkspaceFolders = new Array<string>();
 		this.m_searchPaths = new Array<string>();
 		this.m_lookupTildePathAlsoFromWorkspace = true;
@@ -63,10 +64,7 @@ export class Configuration
 
 	set ExtraExtensionsForTypes(map: object)
 	{
-		if( map !== undefined )
-		{
-			this.m_extraExtensionsForTypes = map;
-		}
+		this.m_extraExtensionsForTypes = map as Suffix[];
 	}
 
 	get ExtraExtensionsForTypes(): object

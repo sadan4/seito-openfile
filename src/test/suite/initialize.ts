@@ -1,6 +1,8 @@
 import {writeFileSync, writeFile, unlink, unlinkSync, mkdirSync, rmdirSync, existsSync} from 'fs';
 
 let WS_ROOT = process.env.WS_ROOT;
+if( WS_ROOT === undefined )
+	WS_ROOT = "./";
 let dirnames = [WS_ROOT + "/Unittests-tmp", WS_ROOT + "/Unittests-tmp/test", WS_ROOT + "/Unittests-tmp/test/dir1", WS_ROOT + "/Unittests-tmp/src", WS_ROOT + "/Unittests-common"];
 let files = [
 	{"name": WS_ROOT + "/Unittests-tmp/test.ts", "content": ""},

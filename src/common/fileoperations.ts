@@ -64,7 +64,7 @@ export class FileOperations
 	/**
 	 * Only return a matched path if the file actually exists.
 	 */
-	public static getAbsolutePathFromFuzzyPath(iPath:string, iCurrPath:string, iSuffix, baseMustBeDir = false): string
+	public static getAbsolutePathFromFuzzyPath(iPath:string, iCurrPath:string, iSuffix: string, baseMustBeDir = false): string
 	{
 		if( iPath === undefined || iPath === "" || iCurrPath === undefined || iCurrPath === "" )
 			return "";
@@ -111,6 +111,9 @@ export class FileOperations
 	public static getAbsoluteHomePath(): string
 	{
 		let prof = (process.platform === 'win32') ? 'USERPROFILE' : 'HOME';
-		return process.env[prof];
+		let p = process.env[prof];
+		if( p === undefined ) 
+			return "";
+		return p;
 	}
 }

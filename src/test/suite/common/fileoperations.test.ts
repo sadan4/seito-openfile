@@ -13,13 +13,14 @@ import {envSetup, envTeardown} from '../initialize';
 import {writeFileSync, writeFile, unlink, unlinkSync, mkdirSync, open, rmdirSync, existsSync, lstatSync} from 'fs';
 import {join, sep, basename} from 'path';
 import * as os from 'os';
-import {FileOperations} from '../../src/common/fileoperations';
-import { OpenFileFromText } from '../../src/commands/openFileFromText';
-import { ConfigHandler } from '../../src/configuration/confighandler';
+import {FileOperations} from '../../../common/fileoperations';
+import { OpenFileFromText } from '../../../commands/openFileFromText';
+import { ConfigHandler } from '../../../configuration/confighandler';
 var trueCasePathSync = require('true-case-path');
-ConfigHandler.preInitInstanceNotFollowingVsCodeSettings();
+//ConfigHandler.preInitInstanceNotFollowingVsCodeSettings();
+ConfigHandler.Instance;
 
-function normalizeSlash(filepath) {		// Only needed for paths with backslash directory separator (originally developed on Windows).  Paths with '/' are treated as hard-coded as slash.
+function normalizeSlash(filepath: string) {		// Only needed for paths with backslash directory separator (originally developed on Windows).  Paths with '/' are treated as hard-coded as slash.
 	return sep == '/' ? filepath.replace(/\\/g, '/') : filepath.replace(/\//g, '\\');
 }
 
@@ -38,6 +39,8 @@ suite("File operation Tests", () => {
 	});
 
 	test("** " + WS_ROOT + "/Unittests-tmp must exists before run tests, and match exact case", () => {
+		if( WS_ROOT === undefined )
+			assert.fail("WS_ROOT is undefined")
 		assert.equal(true, existsSync(WS_ROOT + "/Unittests-tmp"));
 		assert.equal(true, lstatSync(WS_ROOT + "/Unittests-tmp").isDirectory());
 		assert.equal(join(WS_ROOT, "Unittests-tmp"), trueCasePathSync(WS_ROOT + "/Unittests-tmp"));
@@ -71,7 +74,7 @@ suite("File operation Tests", () => {
 	});
 
 	test("RelToAbsPath 4", () => {
-		let rel1;
+		let rel1 = "";
 		let curr1 = normalizeSlash(WS_ROOT + "\\Unittests-tmp\\test\\");
 		let res = FileOperations.getAbsoluteFromRelativePath(rel1, curr1);
 		assert.equal(res, "");
@@ -155,10 +158,12 @@ suite("File operation Tests", () => {
 	test("Github #6: Open with line number", (done) => {
 		// Remark: WS_ROOT + "/Unittests-tmp" folder must exists before running unit tests.  And the letter case of "Unittests-tmp" folder must be exact match.
 		openFile.openDocument(WS_ROOT + "/Unittests-tmp/test/testcase.txt:2").then(value => {
-			assert.equal(vscode.window.activeTextEditor.document.fileName,normalizeSlash(WS_ROOT + "\\Unittests-tmp\\test\\testcase.txt"));
+			assert.equal(vscode.window.activeTextEditor?.document.fileName,normalizeSlash(WS_ROOT + "\\Unittests-tmp\\test\\testcase.txt"));
 
 			// check line is positioned
-			let selections = vscode.window.activeTextEditor.selections;
+			let selections = vscode.window.activeTextEditor?.selections;
+			if( selections === undefined )
+				assert.fail("selection is undefined");
 			assert.equal(1, selections.length);
 			assert.equal(1, selections[0].anchor.line);
 			console.log(value);
@@ -171,10 +176,12 @@ suite("File operation Tests", () => {
 	test("Open with line number and column", (done) => {
 		// Remark: WS_ROOT + "/Unittests-tmp" folder must exists before running unit tests.  And the letter case of "Unittests-tmp" folder must be exact match.
 		openFile.openDocument(WS_ROOT + "/Unittests-tmp/test/testcase.txt:2:5").then(value => {
-			assert.equal(vscode.window.activeTextEditor.document.fileName,normalizeSlash(WS_ROOT + "\\Unittests-tmp\\test\\testcase.txt"));
+			assert.equal(vscode.window.activeTextEditor?.document.fileName,normalizeSlash(WS_ROOT + "\\Unittests-tmp\\test\\testcase.txt"));
 
 			// check line and column is positioned
-			let selections = vscode.window.activeTextEditor.selections;
+			let selections = vscode.window.activeTextEditor?.selections;
+			if( selections === undefined )
+				assert.fail("selection is undefined");
 			assert.equal(1, selections.length);
 			assert.equal(1, selections[0].anchor.line);
 			assert.equal(4, selections[0].anchor.character);
@@ -201,7 +208,7 @@ suite("File operation Tests", () => {
 		assert.equal(res, normalizeSlash(WS_ROOT + "\\Unittests-tmp\\test\\dir1\\testcase2.ts"));
 	});
 	test("resolvePath, resolve path to same folder, fuzzy, extraExtensions", () => {
-		ConfigHandler.Instance.Configuration.ExtraExtensionsForTypes = { "js": ["ts"] };
+		ConfigHandler.Instance.Configuration.ExtraExtensionsForTypes = [{ name:"js", suffixes: ["ts"] }];
 		let res = openFile.resolvePath("testcase2", WS_ROOT + "/Unittests-tmp/test/dir1/testcase2.js"); // Note .js instead of .ts here
 		assert.equal(res, normalizeSlash(WS_ROOT + "\\Unittests-tmp\\test\\dir1\\testcase2.ts"));
 	});
@@ -277,7 +284,9 @@ suite("File operation Tests", () => {
 			let anchor = new vscode.Position(0, 0);
 			let active = new vscode.Position(2, 0);
 			let files = openFile.getWordRanges(new vscode.Selection(anchor, active), doc);
-			assert.equal(2, files.length);
+			if( files === undefined )
+				assert.fail("files are undefined");
+			assert.equal(2, files?.length);
 			assert.equal(WS_ROOT + '/Unittests-tmp/test/testcase.txt:4:3', files[0]);
 			assert.equal(WS_ROOT + '/Unittests-tmp/test/dir1/testcase2.ts:1', files[1]);
 			done();

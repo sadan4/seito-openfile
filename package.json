@@ -5,7 +5,7 @@
   "version": "1.8.5",
   "publisher": "Fr43nk",
   "engines": {
-    "vscode": "^1.15.0"
+    "vscode": "^1.45.0"
   },
   "categories": [
     "Other"
@@ -26,7 +26,7 @@
   "activationEvents": [
     "*"
   ],
-  "main": "./out/src/extension",
+  "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
@@ -86,36 +86,60 @@
         },
         "seito-openfile.extraExtensionsForTypes": {
           "type": "object",
-          "default": {
-            "js": [
-              "jsx"
-            ],
-            "jsx": [
-              "js"
-            ],
-            "ts": [
-              "js",
-              "jsx"
-            ],
-            "vue": [
-              "js",
-              "jsx"
-            ],
-            "c": [
-              "h"
-            ],
-            "cpp": [
+          "default": [
+            {
+              "name": "js",
+              "suffixes": [
+                "jsx"
+              ]
+            },
+            {
+              "name": "jsx",
+              "suffixes": [
+                "js"
+              ]
+            },
+            {
+              "name": "ts",
+              "suffixes" : [
+                "js",
+                "jsx"
+              ]
+            },
+            {
+              "name": "vue",
+              "suffixes": [
+                "js",
+                "jsx"
+              ]
+            },
+            {
+              "name": "c",
+              "suffixes": [
+                "h"
+              ]
+            },
+            {
+              "name": "cpp",
+              "suffixes": [
               "h",
               "hpp"
-            ],
-            "m": [
-              "h"
-            ],
-            "mm": [
-              "h",
-              "hpp"
-            ]
-          },
+              ]
+            },
+            {
+              "name": "m",
+              "suffixes": [
+                "h"
+              ]
+            },
+            {
+              "name": "mm",
+              "suffixes": [
+                "h",
+                "hpp"
+              ]
+            }
+          ],
           "description": "Known suffixes to look for when file string has no suffix, according to current document's type. (suffix match is relative to current document's parent folders only)"
         },
         "seito-openfile.searchSubFoldersOfWorkspaceFolders": {
@@ -161,20 +185,28 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "tsc -p ./",
-    "compile": "tsc -watch -p ./",
-    "postinstall": "node ./node_modules/vscode/bin/install"
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "lint": "eslint src --ext ts",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "test": "node ./out/test/runTest.js"
   },
   "devDependencies": {
-    "typescript": "^2.0.3",
-    "vscode": "^1.0.0",
-    "mocha": "^2.3.3",
-    "@types/node": "^6.0.40",
-    "@types/mocha": "^2.2.32"
+    "@types/glob": "^7.1.1",
+    "@types/mocha": "^7.0.1",
+    "@types/node": "^12.11.7",
+    "@types/vscode": "^1.45.0",
+    "eslint": "^6.8.0",
+    "@typescript-eslint/parser": "^2.18.0",
+    "@typescript-eslint/eslint-plugin": "^2.18.0",
+    "glob": "^7.1.6",
+    "mocha": "^7.0.1",
+    "typescript": "^3.7.5",
+    "vscode-test": "^1.3.0"
   },
   "dependencies": {
     "glob-all": "^3.1.0",
-    "true-case-path": "^1.0.0",
-    "vscode": "^1.1.22"
+    "true-case-path": "^1.0.0"
   }
 }

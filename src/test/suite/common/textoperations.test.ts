@@ -11,9 +11,10 @@ import * as assert from 'assert';
 import * as vscode from 'vscode';
 import {envSetup, envTeardown} from '../initialize';
 import {writeFileSync, writeFile, unlink, unlinkSync, mkdirSync, rmdirSync} from 'fs';
-import {TextOperations} from '../../src/common/textoperations';
-import {ConfigHandler} from '../../src/configuration/confighandler';
-ConfigHandler.preInitInstanceNotFollowingVsCodeSettings();
+import {TextOperations} from '../../../common/textoperations';
+import {ConfigHandler} from '../../../configuration/confighandler';
+//ConfigHandler.preInitInstanceNotFollowingVsCodeSettings();
+ConfigHandler.Instance;
 
 // let dirname = "d:/temp/test";
 // let filename = "d:/temp/test/testcase.txt";
