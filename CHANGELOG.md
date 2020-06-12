@@ -1,5 +1,24 @@
 ## Release Notes
 
+### 1.8.7
+- changed the minimum required vscode version 1.25.0
+
+### 1.8.6
+- can now open symlinked files (thanks to Bryan Harris)
+- changed configuration structure of addition suffixes - it is now an array of objects
+```
+defaults: [
+  {
+    name: "js",
+    suffixes: [
+      "js",
+      "jsx"
+    ]
+    ...
+  }
+]
+```
+
 ### 1.8.5
 - moved repository to gitlab
 

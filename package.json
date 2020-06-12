@@ -2,10 +2,10 @@
   "name": "seito-openfile",
   "displayName": "Open file",
   "description": "Extract a filepath from the current cursor position and open the file",
-  "version": "1.8.5",
+  "version": "1.8.7",
   "publisher": "Fr43nk",
   "engines": {
-    "vscode": "^1.45.0"
+    "vscode": "^1.25.0"
   },
   "categories": [
     "Other"
@@ -196,7 +196,7 @@
     "@types/glob": "^7.1.1",
     "@types/mocha": "^7.0.1",
     "@types/node": "^12.11.7",
-    "@types/vscode": "^1.45.0",
+    "@types/vscode": "^1.25.0",
     "eslint": "^6.8.0",
     "@typescript-eslint/parser": "^2.18.0",
     "@typescript-eslint/eslint-plugin": "^2.18.0",
