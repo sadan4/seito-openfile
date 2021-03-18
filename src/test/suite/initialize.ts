@@ -14,6 +14,7 @@ let files = [
 	{"name": WS_ROOT + "/Unittests-common/test.ts", "content": ""},
 	{"name": WS_ROOT + "/Unittests-tmp/test/dir1/testcase2.ts", "content": "line 1"},
 	{"name": WS_ROOT + "/Unittests-tmp/src/Class1.ts", "content": ""},
+	{"name": WS_ROOT + "/Unittests-tmp/src/Class12", "content": "bla"},
 ];
 
 export function envSetup(): Promise<any>
@@ -41,7 +42,7 @@ export function envSetup(): Promise<any>
 			console.error("Error create file: ", error);
 			reject();
 		}
-		resolve();
+		resolve(null);
 	});
 }
 
@@ -56,7 +57,7 @@ export function envTeardown(): Promise<any>
 			for(let i=dirnames.length-1; i>=0; i--){
 				rmdirSync(dirnames[i]);
 			};
-			resolve();
+			resolve(null);
 		}
 		catch(error)
 		{

@@ -221,9 +221,14 @@ export class OpenFileFromText {
 
 			// Search a workspace folder
 			if (workspaceFolder !== currentWorkspaceFolder || tryWorkspaceHomePath) {
-				let p = FileOperations.getAbsoluteFromAlwaysRelativePath(inputPath + assumeExt, join(workspaceFolder), true);
-				if (existsSync(p))
+				let p = FileOperations.getAbsoluteFromAlwaysRelativePath(inputPath, join(workspaceFolder), true);
+				if (existsSync(p)) {
 					return p;
+				} else {
+					p = FileOperations.getAbsoluteFromAlwaysRelativePath(inputPath + assumeExt, join(workspaceFolder), true);
+					if (existsSync(p))
+						return p;
+				}
 			}
 
 			// Search some subfolders under the workspace folder
@@ -232,18 +237,28 @@ export class OpenFileFromText {
 			let workspaceSubFolders = glob.sync(subFoldersPattern, { cwd: workspaceFolder });
 
 			for (let folder of workspaceSubFolders) {
-				let p = FileOperations.getAbsoluteFromAlwaysRelativePath(inputPath + assumeExt, join(workspaceFolder, folder), true);
-				if (existsSync(p))
+				let p = FileOperations.getAbsoluteFromAlwaysRelativePath(inputPath, join(workspaceFolder, folder), true);
+				if (existsSync(p)) {
 					return p;
+				} else {
+					p = FileOperations.getAbsoluteFromAlwaysRelativePath(inputPath + assumeExt, join(workspaceFolder, folder), true);
+					if (existsSync(p))
+						return p;
+				}
 			}
 		}
 
 		// Addition search paths
 		let searchPaths = tryWorkspaceHomePath ? [] : this.configHandler.Configuration.SearchPaths;
 		for (let folder of searchPaths) {
-			let p = FileOperations.getAbsoluteFromAlwaysRelativePath(inputPath + assumeExt, join(folder), true);
-			if (existsSync(p))
+			let p = FileOperations.getAbsoluteFromAlwaysRelativePath(inputPath, join(folder), true);
+			if (existsSync(p)) {
 				return p;
+			} else {
+				p = FileOperations.getAbsoluteFromAlwaysRelativePath(inputPath + assumeExt, join(folder), true);
+				if (existsSync(p))
+					return p;
+			}
 		}
 		return '';
 	}
