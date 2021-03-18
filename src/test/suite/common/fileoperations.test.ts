@@ -40,7 +40,7 @@ suite("File operation Tests", () => {
 
 	test("** " + WS_ROOT + "/Unittests-tmp must exists before run tests, and match exact case", () => {
 		if( WS_ROOT === undefined )
-			assert.fail("WS_ROOT is undefined")
+			assert.fail(null, null,"WS_ROOT is undefined")
 		assert.equal(true, existsSync(WS_ROOT + "/Unittests-tmp"));
 		assert.equal(true, lstatSync(WS_ROOT + "/Unittests-tmp").isDirectory());
 		assert.equal(join(WS_ROOT, "Unittests-tmp"), trueCasePathSync(WS_ROOT + "/Unittests-tmp"));
@@ -163,7 +163,7 @@ suite("File operation Tests", () => {
 			// check line is positioned
 			let selections = vscode.window.activeTextEditor?.selections;
 			if( selections === undefined )
-				assert.fail("selection is undefined");
+				assert.fail(null, null, "selection is undefined");
 			assert.equal(1, selections.length);
 			assert.equal(1, selections[0].anchor.line);
 			console.log(value);
@@ -181,7 +181,7 @@ suite("File operation Tests", () => {
 			// check line and column is positioned
 			let selections = vscode.window.activeTextEditor?.selections;
 			if( selections === undefined )
-				assert.fail("selection is undefined");
+				assert.fail(null, null, "selection is undefined");
 			assert.equal(1, selections.length);
 			assert.equal(1, selections[0].anchor.line);
 			assert.equal(4, selections[0].anchor.character);
@@ -198,7 +198,8 @@ suite("File operation Tests", () => {
 		assert.equal(res, normalizeSlash(WS_ROOT + "\\Unittests-tmp\\test.ts"));
 	});
 	test("resolvePath, resolve path to home", () => {
-		let homeExistentFile = os.platform() === "win32" ? "~/Desktop/desktop.ini" : "~/.bash_history";
+		let homeExistentFile = os.platform() === "win32" ? "~/Desktop/desktop.ini" : 
+			existsSync("~/.bash_history") === true ? "~/.bash_history" : "~/.zsh_history";
 		let res = openFile.resolvePath(homeExistentFile, WS_ROOT + "/Unittests-common/virtual-current-file");
 		let pos = res.lastIndexOf(sep);
 		assert.equal(pos != -1 ? res.substr(pos) : res, normalizeSlash("\\" + basename(homeExistentFile)));
@@ -285,7 +286,7 @@ suite("File operation Tests", () => {
 			let active = new vscode.Position(2, 0);
 			let files = openFile.getWordRanges(new vscode.Selection(anchor, active), doc);
 			if( files === undefined )
-				assert.fail("files are undefined");
+				assert.fail(null, null, "files are undefined");
 			assert.equal(2, files?.length);
 			assert.equal(WS_ROOT + '/Unittests-tmp/test/testcase.txt:4:3', files[0]);
 			assert.equal(WS_ROOT + '/Unittests-tmp/test/dir1/testcase2.ts:1', files[1]);
@@ -293,6 +294,24 @@ suite("File operation Tests", () => {
 		}, (reason: Error) => {
 			done("Cannot open untitled text: " + reason.message);
 		});
+	});
+
+	test("Gitlab issue 23, open file which has no suffix at all", () => {
+		let res = openFile.resolvePath("../../src/Class12", WS_ROOT + "/Unittests-tmp/test/dir1/testcase2.ts");
+		assert.equal(res, normalizeSlash(WS_ROOT + "\\Unittests-tmp\\src\\Class12"));
+	});
+
+	test("Gitlab issue 23, open file which has no suffix at all, added path to search list", () => {
+		ConfigHandler.Instance.Configuration.SearchPaths = [WS_ROOT + '/',WS_ROOT + '/Unittests-tmp/src'];
+		let res = openFile.resolvePath("Class12", WS_ROOT + "/Unittests-tmp/test/dir1/testcase2.ts");
+		assert.equal(res, normalizeSlash(WS_ROOT + "\\Unittests-tmp\\src\\Class12"));
+	});
+
+	test("Gitlab issue 23, open file which has no suffix at all, added path to search list and subfolders", () => {
+		ConfigHandler.Instance.Configuration.SearchPaths = [WS_ROOT + '/',WS_ROOT + '/Unittests-tmp'];
+		ConfigHandler.Instance.Configuration.SearchSubFoldersOfWorkspaceFolders = ['lib/','src/'];
+		let res = openFile.resolvePath("Class12", WS_ROOT + "/Unittests-tmp/test/dir1/testcase2.ts");
+		assert.equal(res, normalizeSlash(WS_ROOT + "\\Unittests-tmp\\src\\Class12"));
 	});
 
 });
