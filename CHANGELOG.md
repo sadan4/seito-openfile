@@ -1,5 +1,9 @@
 ## Release Notes
 
+### 1.8.8
+- fixed gitlab issue #23:
+   open a file which has no extension
+
 ### 1.8.7
 - changed the minimum required vscode version 1.25.0
 
