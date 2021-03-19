@@ -191,7 +191,7 @@
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "test": "node ./out/test/runTest.js",
-    "test-unit": "npm run compile && mocha ./out/**.test.js",
+    "test-unit": "npm run compile && mocha ./out/test/suite/**.test.js",
 		"test-integration": "npm run compile && node ./out/test/runTest.js"
   },
   "devDependencies": {
