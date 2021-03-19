@@ -1,12 +1,18 @@
 image: node:12-slim
 
 stages:
+  - prepare
   - test
   - package
   - publish
 
 variables:
   WS_ROOT: "/var/tmp/testfiles"
+
+SetupEnvironment:
+  stage: prepare
+  script:
+    - mkdir -p $WS_ROOT
 
 lint:
   stage: test
@@ -17,7 +23,6 @@ lint:
 test-unit:
   stage: test
   script:
-    - mkdir -p "$WS_ROOT"
     - npm ci
     - yarn run test-unit
 
