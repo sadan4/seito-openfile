@@ -4,6 +4,7 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+			"label": "defaultBuildTask",
 			"type": "npm",
 			"script": "compile",
 			"problemMatcher": "$tsc-watch",
@@ -15,6 +16,16 @@
 				"kind": "build",
 				"isDefault": true
 			}
+		},
+		{
+			"label": "createDir",
+			"type": "shell",
+			"command": "mkdir",
+			"args": ["${workspaceFolder}/Unittests-tmp"],
+		},
+		{
+			"label": "testtask",
+			"dependsOn": ["createDir", "defaultBuildTask"]
 		}
 	]
 }

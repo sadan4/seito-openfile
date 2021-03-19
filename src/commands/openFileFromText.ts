@@ -252,11 +252,11 @@ export class OpenFileFromText {
 		let searchPaths = tryWorkspaceHomePath ? [] : this.configHandler.Configuration.SearchPaths;
 		for (let folder of searchPaths) {
 			let p = FileOperations.getAbsoluteFromAlwaysRelativePath(inputPath, join(folder), true);
-			if (existsSync(p)) {
+			if (existsSync(p) && lstatSync(p).isFile()) {
 				return p;
 			} else {
 				p = FileOperations.getAbsoluteFromAlwaysRelativePath(inputPath + assumeExt, join(folder), true);
-				if (existsSync(p))
+				if (existsSync(p) && lstatSync(p).isFile())
 					return p;
 			}
 		}

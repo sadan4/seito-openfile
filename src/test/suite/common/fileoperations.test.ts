@@ -222,6 +222,7 @@ suite("File operation Tests", () => {
 		assert.equal(res, normalizeSlash(WS_ROOT + "\\Unittests-tmp\\test\\dir1\\testcase2.ts"));
 	});
 	test("resolvePath, resolve path to workspace folder", () => {
+		ConfigHandler.Instance.Configuration.SearchPaths = [WS_ROOT + '/', `${WS_ROOT}/Unittests-tmp/`, `${WS_ROOT}/Unittests-common/`];
 		let res = openFile.resolvePath("test/hans.txt", WS_ROOT + "/Unittests-common/test.ts");
 		assert.equal(res, normalizeSlash(WS_ROOT + "\\Unittests-tmp\\test\\hans.txt"));
 	});
@@ -230,6 +231,7 @@ suite("File operation Tests", () => {
 		assert.equal(res, normalizeSlash(WS_ROOT + "\\Unittests-tmp\\test\\test.scss"));
 	});
 	test("resolvePath, resolve path to workspace src folder, without file extension", () => {
+		ConfigHandler.Instance.Configuration.SearchPaths = [WS_ROOT + '/', `${WS_ROOT}/Unittests-tmp/`, `${WS_ROOT}/Unittests-common/`];
 		ConfigHandler.Instance.Configuration.SearchSubFoldersOfWorkspaceFolders = ['lib/','src/'];
 		let res = openFile.resolvePath("Class1", WS_ROOT + "/Unittests-tmp/test/dir1/testcase2.ts");
 		assert.equal(res, normalizeSlash(WS_ROOT + "\\Unittests-tmp\\src\\Class1.ts"));

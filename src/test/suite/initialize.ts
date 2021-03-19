@@ -3,9 +3,17 @@ import {writeFileSync, writeFile, unlink, unlinkSync, mkdirSync, rmdirSync, exis
 let WS_ROOT = process.env.WS_ROOT;
 if( WS_ROOT === undefined )
 	WS_ROOT = "./";
-let dirnames = [WS_ROOT + "/Unittests-tmp", WS_ROOT + "/Unittests-tmp/test", WS_ROOT + "/Unittests-tmp/test/dir1", WS_ROOT + "/Unittests-tmp/src", WS_ROOT + "/Unittests-common"];
+let dirnames = [
+	WS_ROOT + "/Unittests-tmp",
+	WS_ROOT + "/Unittests-tmp/test",
+	WS_ROOT + "/Unittests-tmp/test/dir1",
+	WS_ROOT + "/Unittests-tmp/src",
+	WS_ROOT + "/Unittests-common",
+	WS_ROOT + "/Unittests-common/test"
+];
 let files = [
 	{"name": WS_ROOT + "/Unittests-tmp/test.ts", "content": ""},
+	{"name": WS_ROOT + "/Unittests-tmp/.DS_Store", "content": ""},
 	{"name": WS_ROOT + "/Unittests-tmp/test/hans.txt", "content": ""},
 	{"name": WS_ROOT + "/Unittests-tmp/test/test.scss", "content": ""},
 	{"name": WS_ROOT + "/Unittests-tmp/test/_test2.scss", "content": ""},
@@ -54,9 +62,7 @@ export function envTeardown(): Promise<any>
 			files.forEach(file => {
 				unlinkSync(file.name);
 			});
-			for(let i=dirnames.length-1; i>=0; i--){
-				rmdirSync(dirnames[i]);
-			};
+			rmdirSync(dirnames[0], {recursive: true});
 			resolve(null);
 		}
 		catch(error)

@@ -1,9 +1,15 @@
+import { existsSync, mkdirSync } from 'fs';
 import * as path from 'path';
 
 import { runTests } from 'vscode-test';
 
 async function main() {
 	try {
+		const WS_ROOT = process.env.WS_ROOT;
+		const dirn = WS_ROOT + "/Unittests-tmp";
+		if(!existsSync(dirn))
+			mkdirSync(dirn);
+	
 		// The folder containing the Extension Manifest package.json
 		// Passed to `--extensionDevelopmentPath`
 		const extensionDevelopmentPath = path.resolve(__dirname, '../../');
