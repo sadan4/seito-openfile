@@ -7,12 +7,12 @@ stages:
   - publish
 
 variables:
-  WS_ROOT: /var/tmp/testfiles
+  WS_ROOT: "/var/tmp/testfiles"
 
 SetupEnvironment:
   stage: prepare
   script:
-    - /bin/mkdir -p $WS_ROOT
+    - /bin/mkdir -p `echo $WS_ROOT`
 
 lint:
   stage: test
