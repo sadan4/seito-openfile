@@ -27,8 +27,6 @@ test-integration:
   variables:
     DISPLAY: ':99.0'
   script:
-    - echo "Is path available"
-    - /bin/ls -alh $WS_ROOT
     - apt-get update
     - apt-get install -y xvfb libxtst6 libnss3 libgtk-3-0 libxss1 libasound2 libsecret-1-0 git
     - npm ci
