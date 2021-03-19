@@ -12,7 +12,7 @@ variables:
 SetupEnvironment:
   stage: prepare
   script:
-    - /bin/mkdir -p `echo $WS_ROOT`
+    - /bin/mkdir -p $WS_ROOT
 
 lint:
   stage: test
@@ -23,6 +23,7 @@ lint:
 test-unit:
   stage: test
   script:
+    - /bin/mkdir -p $WS_ROOT
     - npm ci
     - yarn run test-unit
 
@@ -36,6 +37,7 @@ test-integration:
     - npm ci
     - echo $DISPLAY
     - /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+    - /bin/mkdir -p $WS_ROOT
     - yarn test-integration
 
 package:
