@@ -5,6 +5,9 @@ stages:
   - package
   - publish
 
+variables:
+  WS_ROOT: "/var/tmp/testfiles"
+
 lint:
   stage: test
   script:
@@ -14,6 +17,7 @@ lint:
 test-unit:
   stage: test
   script:
+    - mkdir -p "$WS_ROOT"
     - npm ci
     - yarn run test-unit
 
