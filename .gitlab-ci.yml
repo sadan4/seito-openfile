@@ -12,7 +12,7 @@ variables:
 SetupEnvironment:
   stage: prepare
   script:
-    - mkdir -p $WS_ROOT
+    - /bin/mkdir -p $WS_ROOT
 
 lint:
   stage: test
