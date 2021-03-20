@@ -12,6 +12,7 @@ variables:
 lint:
   stage: test
   script:
+    - echo $CI_BUILDS_DIR
     - npm ci
     - npm run lint
 
