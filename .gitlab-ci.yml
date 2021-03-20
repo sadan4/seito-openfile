@@ -6,7 +6,7 @@ stages:
   - publish
 
 variables:
-  WS_ROOT: "/var/tmp/testfiles"
+  WS_ROOT: "/builds/fr43nk/seito-openfile/"
   BUILD_PATH: "/Unittests-tmp"
 
 lint:
