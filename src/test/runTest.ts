@@ -5,9 +5,8 @@ import { runTests } from 'vscode-test';
 
 async function main() {
 	try {
-		const WS_ROOT = process.env.WS_ROOT;
-		const BUILD_PATH = process.env.BUILD_PATH;
-		console.log(WS_ROOT, BUILD_PATH);
+		const wsRoot = process.env.WS_ROOT + process.env.BUILD_PATH;
+		console.log(`Workspace root: ${wsRoot}`);
 		
 		// The folder containing the Extension Manifest package.json
 		// Passed to `--extensionDevelopmentPath`
@@ -18,7 +17,7 @@ async function main() {
 		const extensionTestsPath = path.resolve(__dirname, './suite/index');
 
 		// Download VS Code, unzip it and run the integration test
-		await runTests({ extensionDevelopmentPath, extensionTestsPath, launchArgs: [WS_ROOT + BUILD_PATH] });
+		await runTests({ extensionDevelopmentPath, extensionTestsPath, launchArgs: [wsRoot] });
 	} catch (err) {
 		console.error('Failed to run tests');
 		process.exit(1);
