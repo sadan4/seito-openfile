@@ -16,14 +16,6 @@ lint:
     - npm ci
     - npm run lint
 
-test-unit:
-  stage: test
-  script:
-    - /bin/mkdir -p $WS_ROOT$BUILD_PATH
-    - /usr/bin/touch ~/.zsh_history
-    - npm ci
-    - yarn run test-unit
-
 test-integration:
   stage: test
   variables:
