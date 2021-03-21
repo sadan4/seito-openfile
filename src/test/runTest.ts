@@ -5,8 +5,8 @@ import { runTests } from 'vscode-test';
 
 async function main() {
 	try {
-		// const wsRoot = process.env.WS_ROOT + process.env.BUILD_PATH;
-		const wsRoot = "/builds/fr43nk/seito-openfile/Unittests-tmp";
+		const wsRoot = process.env.WS_ROOT;
+		// const wsRoot = "/builds/fr43nk/seito-openfile/Unittests-tmp";
 		console.log(`Workspace root: ${wsRoot}`);
 		
 		// The folder containing the Extension Manifest package.json
