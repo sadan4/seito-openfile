@@ -5,7 +5,7 @@ import { runTests } from 'vscode-test';
 
 async function main() {
 	try {
-		const wsRoot = process.env.WS_ROOT;
+		const wsRoot = process.env.WSROOT;
 		// const wsRoot = "/builds/fr43nk/seito-openfile/Unittests-tmp";
 		console.log(`Workspace root: ${wsRoot}`);
 		

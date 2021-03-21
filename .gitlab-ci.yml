@@ -28,7 +28,8 @@ test-integration:
     - npm ci
     - echo $DISPLAY
     - /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-    - WS_ROOT=$WS_ROOT$BUILD_PATH yarn test-integration
+    - setenv WSROOT $WS_ROOT$BUILD_PATH
+    - yarn test-integration
 
 package:
   stage: package
