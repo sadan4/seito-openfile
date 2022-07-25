@@ -32,16 +32,19 @@ export class OpenFileFromText {
 	}
 
 	public execute() {
-		if( this.editor === undefined )
+		if( this.editor === undefined ){
 			return;
+		}
 		let numSelections = this.editor.selections.length;
 		let isOpeningMultipleFiles = numSelections > 1;	// if there are more than 1 file to open, open in new tab for all.
 		for (let i: number = 0; i < numSelections; i++) {
 			let words = this.getWordRanges(this.editor.selections[i]);
-			if( words === undefined )
+			if( words === undefined ){
 				continue;
-			if (!isOpeningMultipleFiles && words.length > 1)
+			}
+			if (!isOpeningMultipleFiles && words.length > 1){
 				isOpeningMultipleFiles = true;
+			}
 			let openForceNewTab = isOpeningMultipleFiles || this.configHandler.Configuration.OpenNewTab;
 			for (let word of words) {
 				this.openDocument(word, openForceNewTab).then(path => {
@@ -84,22 +87,23 @@ export class OpenFileFromText {
 					isMatchedLeadingPath = true;
 					lengthOfMatch -= 1;	// decrement for the tailing '*'
 					let i = lengthOfMatch;
-					while (i < tempInputPathWithoutLeadingSlash.length && tempInputPathWithoutLeadingSlash[i] != '/') {
+					while (i < tempInputPathWithoutLeadingSlash.length && tempInputPathWithoutLeadingSlash[i] !== '/') {
 						++i;
 					}
 					stringStarExpandTo = tempInputPathWithoutLeadingSlash.substr(lengthOfMatch, i - lengthOfMatch);
 					lengthOfMatch = i;
 				} else {
-					isMatchedLeadingPath = (tempInputPathWithoutLeadingSlash.length == lengthOfMatch || tempInputPathWithoutLeadingSlash[lengthOfMatch] == '/');
+					isMatchedLeadingPath = (tempInputPathWithoutLeadingSlash.length === lengthOfMatch || tempInputPathWithoutLeadingSlash[lengthOfMatch] === '/');
 				}
 			}
 			if (isMatchedLeadingPath) {
 				let mappedPath = this.trimPathSeparator(leadingPathMapping[leadingPaths[i]]);
 				let remainPath = tempInputPathWithoutLeadingSlash.substr(lengthOfMatch);	// cut the match to leadingPath
-				if (mappedPath == '')	// delete folder levels
+				if (mappedPath === ''){	// delete folder levels
 					remainPath = this.trimPathSeparator(remainPath);
-				else if (isEndWithStar)
+				} else if (isEndWithStar) {
 					mappedPath = mappedPath.replace('*', stringStarExpandTo);	// expand a '*' if it exists.
+				}
 				let newPath = (isSlashAbsolutePath ? '/' : '') + mappedPath + remainPath;		// remainPath must either be empty or start with '/', as checked above
 				if (newPath !== '') {
 					return newPath;		// improvement: if whole path is translated to empty string (may be deletion), such as "$variable" for leadingPathMapping = { "$*": "" }, it is better not accepted for this case to translated.  But continue the search.
@@ -116,8 +120,9 @@ export class OpenFileFromText {
 	 */
 	public resolvePath(inputPath: string, iCurrentDocFileName?: string): string {
 		let currentDocUri : vscode.Uri|null = this.editor ? this.editor.document.uri : null;
-		if (iCurrentDocFileName !== undefined)
+		if (iCurrentDocFileName !== undefined){
 			currentDocUri = vscode.Uri.file(iCurrentDocFileName);
+		}
 		let currentDocFileName = currentDocUri ? currentDocUri.fsPath : '';
 		let basePath = dirname(currentDocFileName);
 
@@ -134,20 +139,23 @@ export class OpenFileFromText {
 
 		// First, try relative to current document's folder, or absolute path, or relative to "~"
 		let p = FileOperations.getAbsoluteFromRelativePath(inputPath, basePath, true);
-		if ( existsSync(p) && lstatSync(p).isFile() )
+		if ( existsSync(p) && lstatSync(p).isFile() ){
 			return p;
+		}
 		try{
 			accessSync(p, constants.R_OK);
-			if( lstatSync(p).isSymbolicLink() )
+			if( lstatSync(p).isSymbolicLink() ){
 				return p;
+			}
 		} catch(e) {
 			;
 		}
 
 		let isHomePath = inputPath[0] === "~";
 		let tryWorkspaceHomePath = false;
-		if (isHomePath && this.configHandler.Configuration.LookupTildePathAlsoFromWorkspace)
+		if (isHomePath && this.configHandler.Configuration.LookupTildePathAlsoFromWorkspace){
 			tryWorkspaceHomePath = true;
+		}
 		if ( (isHomePath && !tryWorkspaceHomePath) ||
 				(isAbsolutePath && !isSlashAbsolutePath) ) { // only relative path (or absolute path start with single slash/backslash, not C: drive) can continue to lookup from other folders
 			return '';
@@ -166,8 +174,9 @@ export class OpenFileFromText {
 			let extensionsMap: Suffix[] = this.configHandler.Configuration.ExtraExtensionsForTypes as Suffix[];
 			let extraExtensions: string[] = [];
 			let suffix = extensionsMap.find((va:Suffix) => va.name === assumeExtWithoutDot);
-			if( suffix !== undefined )
+			if( suffix !== undefined ){
 				extraExtensions = [...suffix.suffixes];
+			}
 			extensions = this.mergeDeduplicate(assumeExtWithoutDot, extraExtensions, this.configHandler.Configuration.Extensions);
 		}
 
@@ -185,8 +194,9 @@ export class OpenFileFromText {
 		// Try fuzzy for single leading slash/backslash absolute path
 		if (isAbsolutePath || tryWorkspaceHomePath) {
 			p = this.getAbsolutePathFromFuzzyPathWithMultipleExtensions(inputPath, basePath, extensions, true);
-			if (p != '')
+			if (p !== ''){
 				return "";
+			}
 
 			if (isAbsolutePath) {
 				// From now on, treat even '/path/to/something' as relative path.  Thus, cut the leading slash/backslash
@@ -202,19 +212,21 @@ export class OpenFileFromText {
 		if (!tryWorkspaceHomePath) {
 			while (true) {
 				p = this.getAbsolutePathFromFuzzyPathWithMultipleExtensions(inputPath, basePath, extensions, true);
-				if (p != '') {
+				if (p !== '') {
 					return p;
 				}
-				if (finalConditionRe.test(basePath) || !isWithinAWorkspaceFolder || join(basePath) === currentWorkspaceFolder) // break at workspace folder, or root path of system (finalConditionRe)
+				if (finalConditionRe.test(basePath) || !isWithinAWorkspaceFolder || join(basePath) === currentWorkspaceFolder){ // break at workspace folder, or root path of system (finalConditionRe)
 					break;
+				}
 				basePath = dirname(basePath); // go up one folder level
 			}
 		}
 
 		// Search workspace folders and some subfolders under them.  Not fuzzily, only default to current document's file extension if none (+ assumeExt).
 		let workspaceFolders: vscode.WorkspaceFolder[] = [];
-		if (isWithinAWorkspaceFolder && currentWorkspaceFolderObj !== undefined)
+		if (isWithinAWorkspaceFolder && currentWorkspaceFolderObj !== undefined){
 			workspaceFolders.push(currentWorkspaceFolderObj);
+		}
 		workspaceFolders = this.mergeDeduplicate(workspaceFolders, vscode.workspace.workspaceFolders || []);
 		for (let workspaceFolderObj of workspaceFolders) {
 			let workspaceFolder = workspaceFolderObj.uri.fsPath;
@@ -226,8 +238,9 @@ export class OpenFileFromText {
 					return p;
 				} else {
 					p = FileOperations.getAbsoluteFromAlwaysRelativePath(inputPath + assumeExt, join(workspaceFolder), true);
-					if (existsSync(p))
+					if (existsSync(p)){
 						return p;
+					}
 				}
 			}
 
@@ -242,8 +255,9 @@ export class OpenFileFromText {
 					return p;
 				} else {
 					p = FileOperations.getAbsoluteFromAlwaysRelativePath(inputPath + assumeExt, join(workspaceFolder, folder), true);
-					if (existsSync(p))
+					if (existsSync(p)){
 						return p;
+					}
 				}
 			}
 		}
@@ -256,8 +270,9 @@ export class OpenFileFromText {
 				return p;
 			} else {
 				p = FileOperations.getAbsoluteFromAlwaysRelativePath(inputPath + assumeExt, join(folder), true);
-				if (existsSync(p) && lstatSync(p).isFile())
+				if (existsSync(p) && lstatSync(p).isFile()){
 					return p;
+				}
 			}
 		}
 		return '';
@@ -265,8 +280,9 @@ export class OpenFileFromText {
 
 	public openDocument(iWord: string, iForceNewTab: boolean = false): Promise<any> {
 		return new Promise<any>((resolve, reject) => {
-			if (iWord === undefined || iWord === "")
+			if (iWord === undefined || iWord === ""){
 				reject("Path is empty");
+			}
 
 			let fileAndLine = TextOperations.getPathAndPosition(iWord);
 			let p = this.resolvePath(fileAndLine.file);
@@ -275,11 +291,31 @@ export class OpenFileFromText {
 				vscode.workspace.openTextDocument(p).then((iDoc) => {
 					if (iDoc !== undefined) {
 						let showOptions = {"preview": false, "selection": new vscode.Selection(0,0,0,0)};
-						if (iForceNewTab)
+						if (iForceNewTab) {
 							showOptions['preview'] = false;
+						}
 						let targetSelection = new vscode.Selection(0, 0, 0, 0);
+						let realCharPos = 0;
 						if (fileAndLine.line > 0) {
-							let pos = new vscode.Position(fileAndLine.line - 1, fileAndLine.column > 0 ? fileAndLine.column - 1 : 0);
+							// iterate to position in line, check for unicode to get to the right position
+							if( fileAndLine.column > 0 ) {
+								const _l = iDoc.lineAt(fileAndLine.line - 1).text;
+								for(let i=0; i<fileAndLine.column; i++) {
+									const _sub = _l.substring(realCharPos,realCharPos+2);
+									let _res:boolean|number = false;
+									try {
+										_res = (TextOperations.fixedCharCodeAt(_sub,0) && TextOperations.fixedCharCodeAt(_sub,1)===false);
+									} catch (error) {
+										_res = false;
+									}
+									if( _res === true ){
+										realCharPos += 2;
+									} else {
+										realCharPos += 1;
+									}
+								}
+							}
+							let pos = new vscode.Position(fileAndLine.line - 1, realCharPos > 0 ? realCharPos - 1 : 0);
 							targetSelection = new vscode.Selection(pos, pos);
 							if (fileAndLine.column < 0) {
 								// Optional: this preserve old plug-in's behavior that whole line is selected
@@ -319,7 +355,7 @@ export class OpenFileFromText {
 		let p;
 		for (let extension of iSuffixes) {
 			p = FileOperations.getAbsolutePathFromFuzzyPath(iPath, iCurrPath, extension, baseMustBeDir);
-			if (p != '') {
+			if (p !== '') {
 				return p;
 			}
 		}
@@ -330,8 +366,9 @@ export class OpenFileFromText {
 		let line: string;
 		let start: vscode.Position;
 		let document = iDocument !== undefined ? iDocument : this.editor?.document;
-		if( document === undefined )
+		if( document === undefined ){
 			return;
+		}
 
 		if (selection.isEmpty) {
 			line = document.lineAt(selection.active.line).text;

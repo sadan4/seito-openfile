@@ -1,8 +1,9 @@
 import {writeFileSync, writeFile, unlink, unlinkSync, mkdirSync, rmdirSync, existsSync} from 'fs';
 
 let WS_ROOT = process.env.WS_ROOT;
-if( WS_ROOT === undefined )
+if( WS_ROOT === undefined ){
 	WS_ROOT = "./";
+}
 let dirnames = [
 	WS_ROOT + "/Unittests-tmp",
 	WS_ROOT + "/Unittests-tmp/test",
@@ -13,6 +14,7 @@ let dirnames = [
 ];
 let files = [
 	{"name": WS_ROOT + "/Unittests-tmp/test.ts", "content": ""},
+	{"name": WS_ROOT + "/Unittests-tmp/Unicode.txt", "content": "lorem ipsum\r\n😀😀😀dmfmg d ssd 😀😀😀d😀😀😀😀"},
 	{"name": WS_ROOT + "/Unittests-tmp/.DS_Store", "content": ""},
 	{"name": WS_ROOT + "/Unittests-tmp/test/hans.txt", "content": ""},
 	{"name": WS_ROOT + "/Unittests-tmp/test/test.scss", "content": ""},
@@ -28,11 +30,12 @@ let files = [
 export function envSetup(): Promise<any>
 {
 	return new Promise<any>((resolve, reject) => {
-		console.log("Initialize!")
+		console.log("Initialize!");
 		try{
 			dirnames.forEach(dirname => {
-				if(!existsSync(dirname))
+				if(!existsSync(dirname)){
 					mkdirSync(dirname);
+				}
 			});
 		}
 		catch(error)
