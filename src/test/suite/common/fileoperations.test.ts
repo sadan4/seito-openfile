@@ -21,7 +21,7 @@ var trueCasePathSync = require('true-case-path');
 ConfigHandler.Instance;
 
 function normalizeSlash(filepath: string) {		// Only needed for paths with backslash directory separator (originally developed on Windows).  Paths with '/' are treated as hard-coded as slash.
-	return sep == '/' ? filepath.replace(/\\/g, '/') : filepath.replace(/\//g, '\\');
+	return sep === '/' ? filepath.replace(/\\/g, '/') : filepath.replace(/\//g, '\\');
 }
 
 // Defines a Mocha test suite to group tests of similar kind together
@@ -39,8 +39,9 @@ suite("File operation Tests", () => {
 	});
 
 	test("** " + WS_ROOT + "/Unittests-tmp must exists before run tests, and match exact case", () => {
-		if( WS_ROOT === undefined )
-			assert.fail(null, null,"WS_ROOT is undefined")
+		if( WS_ROOT === undefined ){
+			assert.fail(null, null,"WS_ROOT is undefined");
+		}
 		assert.equal(true, existsSync(WS_ROOT + "/Unittests-tmp"));
 		assert.equal(true, lstatSync(WS_ROOT + "/Unittests-tmp").isDirectory());
 		assert.equal(join(WS_ROOT, "Unittests-tmp"), trueCasePathSync(WS_ROOT + "/Unittests-tmp"));
@@ -162,8 +163,9 @@ suite("File operation Tests", () => {
 
 			// check line is positioned
 			let selections = vscode.window.activeTextEditor?.selections;
-			if( selections === undefined )
+			if( selections === undefined ){
 				assert.fail(null, null, "selection is undefined");
+			}
 			assert.equal(1, selections.length);
 			assert.equal(1, selections[0].anchor.line);
 			console.log(value);
@@ -180,8 +182,9 @@ suite("File operation Tests", () => {
 
 			// check line and column is positioned
 			let selections = vscode.window.activeTextEditor?.selections;
-			if( selections === undefined )
+			if( selections === undefined ){
 				assert.fail(null, null, "selection is undefined");
+			}
 			assert.equal(1, selections.length);
 			assert.equal(1, selections[0].anchor.line);
 			assert.equal(4, selections[0].anchor.character);
@@ -199,10 +202,10 @@ suite("File operation Tests", () => {
 	});
 	test("resolvePath, resolve path to home", () => {
 		let homeExistentFile = os.platform() === "win32" ? "~/Desktop/desktop.ini" : 
-			existsSync("~/.bash_history") === true ? "~/.bash_history" : "~/.zsh_history";
+			existsSync("~/.bash_history") === true ? "~/.bash_history" : existsSync("~/.zsh_history") ? "~/.bashrc" : "~/.zshrc";
 		let res = openFile.resolvePath(homeExistentFile, WS_ROOT + "/Unittests-common/virtual-current-file");
 		let pos = res.lastIndexOf(sep);
-		assert.equal(pos != -1 ? res.substr(pos) : res, normalizeSlash("\\" + basename(homeExistentFile)));
+		assert.equal(pos !== -1 ? res.substr(pos) : res, normalizeSlash("\\" + basename(homeExistentFile)));
 	});
 	test("resolvePath, resolve path to same folder, without file extension, implicit file extension", () => {
 		let res = openFile.resolvePath("testcase2", WS_ROOT + "/Unittests-tmp/test/dir1/testcase2.ts");
@@ -287,8 +290,9 @@ suite("File operation Tests", () => {
 			let anchor = new vscode.Position(0, 0);
 			let active = new vscode.Position(2, 0);
 			let files = openFile.getWordRanges(new vscode.Selection(anchor, active), doc);
-			if( files === undefined )
+			if( files === undefined ){
 				assert.fail(null, null, "files are undefined");
+			}
 			assert.equal(2, files?.length);
 			assert.equal(WS_ROOT + '/Unittests-tmp/test/testcase.txt:4:3', files[0]);
 			assert.equal(WS_ROOT + '/Unittests-tmp/test/dir1/testcase2.ts:1', files[1]);

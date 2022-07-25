@@ -38,73 +38,73 @@ suite("Text operation Tests", () => {
 
 	test("Get word, wrong position", () => {
 		let pos = new vscode.Position(2, 4);
-		let res = TextOperations.getWordBetweenBounds('hi', pos)
+		let res = TextOperations.getWordBetweenBounds('hi', pos);
 		assert.equal(res, "");
 	});
 
 	test("Get word, left most position", () => {
 		let pos = new vscode.Position(2, 4);
-		let res = TextOperations.getWordBetweenBounds('hi "welt"', pos)
+		let res = TextOperations.getWordBetweenBounds('hi "welt"', pos);
 		assert.equal(res, "welt");
 	});
 
 	test("Get word, right most position", () => {
 		let pos = new vscode.Position(2, 7);
-		let res = TextOperations.getWordBetweenBounds('hi "welt"', pos)
+		let res = TextOperations.getWordBetweenBounds('hi "welt"', pos);
 		assert.equal(res, "welt");
 	});
 
 	test("Get word, empty quoted string", () => {
 		let pos = new vscode.Position(2, 4);
-		let res = TextOperations.getWordBetweenBounds('hi ""', pos)
+		let res = TextOperations.getWordBetweenBounds('hi ""', pos);
 		assert.equal(res, "");
 	});
 
 	test("Get word, comment line", () => {
 		let pos = new vscode.Position(2, 6);
-		let res = TextOperations.getWordBetweenBounds('#hi/welt', pos)
+		let res = TextOperations.getWordBetweenBounds('#hi/welt', pos);
 		assert.equal(res, "hi/welt");
 	});
 
 	test("Get word, space delimited", () => {
 		let pos = new vscode.Position(2, 6);
-		let res = TextOperations.getWordBetweenBounds('hey hi/welt', pos)
+		let res = TextOperations.getWordBetweenBounds('hey hi/welt', pos);
 		assert.equal(res, "hi/welt");
 	});
 
 	test("Get word, <> bound", () => {
 		let pos = new vscode.Position(2, 6);
-		let res = TextOperations.getWordBetweenBounds(' <hi/welt>', pos)
+		let res = TextOperations.getWordBetweenBounds(' <hi/welt>', pos);
 		assert.equal(res, "hi/welt");
 	});
 
 	test("Get word, '' bound", () => {
 		let pos = new vscode.Position(2, 6);
-		let res = TextOperations.getWordBetweenBounds(' \'hi/welt\'', pos)
+		let res = TextOperations.getWordBetweenBounds(' \'hi/welt\'', pos);
 		assert.equal(res, "hi/welt");
 	});
 
 	test("Get word, \"\" bound", () => {
 		let pos = new vscode.Position(2, 6);
-		let res = TextOperations.getWordBetweenBounds(' "hi/welt"', pos)
+		let res = TextOperations.getWordBetweenBounds(' "hi/welt"', pos);
 		assert.equal(res, "hi/welt");
 	});
 
 	test("Get word, \" bound, missing right \"", () => {
 		let pos = new vscode.Position(2, 6);
-		let res = TextOperations.getWordBetweenBounds(' "hi/welt  puh', pos)
+		let res = TextOperations.getWordBetweenBounds(' "hi/welt  puh', pos);
 		assert.equal(res, "hi/welt");
 	});
 
 	test("Get word, \" bound, leading .. ", () => {
 		let pos = new vscode.Position(2, 16);
-		let res = TextOperations.getWordBetweenBounds('ein Text davor "..\\hi\\datei.txt" und dann noch was danach', pos)
+		let res = TextOperations.getWordBetweenBounds('ein Text davor "..\\hi\\datei.txt" und dann noch was danach', pos);
 		assert.equal(res, "..\\hi\\datei.txt");
 	});
 
 	test("Get word, right most position, with config", () => {
 		let pos = new vscode.Position(2, 7);
-		let res = TextOperations.getWordBetweenBounds('hi ":welt da:"', pos, /\:/)
+		let res = TextOperations.getWordBetweenBounds('hi ":welt da:"', pos, /\:/);
 		assert.equal(res, "welt da");
 	});
 
@@ -164,6 +164,20 @@ suite("Text operation Tests", () => {
 		assert.equal(res.file, "l:\\Datas\\Test.txt");
 		assert.equal(res.line, "42");
 		assert.equal(res.column, "10");
+	});
+
+	test("Issue 25: Goto right position if non-bmp characters are in content", () => {
+		let res = TextOperations.getPathAndPosition("l:\\Datas\\Unicode.txt:2:12");
+		assert.equal(res.file, "l:\\Datas\\Unicode.txt");
+		assert.equal(res.line, "2");
+		assert.equal(res.column, "12");
+	});
+
+	test("Issue 25: Goto right position if non-bmp characters are in content", () => {
+		let res = TextOperations.getPathAndPosition("l:\\Datas\\Unicode.txt:2:12");
+		assert.equal(res.file, "l:\\Datas\\Unicode.txt");
+		assert.equal(res.line, "2");
+		assert.equal(res.column, "12");
 	});
 
 });
