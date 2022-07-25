@@ -1,5 +1,8 @@
 ## Release Notes
 
+### 1.8.9
+- fixed open file with Non-BMP characters
+
 ### 1.8.8
 - fixed gitlab issue #23:
    open a file which has no extension
