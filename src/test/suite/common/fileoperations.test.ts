@@ -203,9 +203,11 @@ suite("File operation Tests", () => {
 	test("resolvePath, resolve path to home", () => {
 		let homeExistentFile = os.platform() === "win32" ? "~/Desktop/desktop.ini" : 
 			existsSync("~/.bash_history") === true ? "~/.bash_history" : existsSync("~/.zsh_history") ? "~/.bashrc" : "~/.zshrc";
-		let res = openFile.resolvePath(homeExistentFile, WS_ROOT + "/Unittests-common/virtual-current-file");
-		let pos = res.lastIndexOf(sep);
-		assert.equal(pos !== -1 ? res.substr(pos) : res, normalizeSlash("\\" + basename(homeExistentFile)));
+		if( existsSync(homeExistentFile) ){
+			let res = openFile.resolvePath(homeExistentFile, WS_ROOT + "/Unittests-common/virtual-current-file");
+			let pos = res.lastIndexOf(sep);
+			assert.equal(pos !== -1 ? res.substr(pos) : res, normalizeSlash("\\" + basename(homeExistentFile)));
+		}
 	});
 	test("resolvePath, resolve path to same folder, without file extension, implicit file extension", () => {
 		let res = openFile.resolvePath("testcase2", WS_ROOT + "/Unittests-tmp/test/dir1/testcase2.ts");
