@@ -34,8 +34,9 @@ package:
   stage: package
   script:
     - npm ci
-    - sudo -E npm install --global vsce
-    - sudo -E npx vsce package
+    - chmod -R 0777 /root/.npm
+    - npm install --global vsce
+    - npx vsce package
   artifacts:
     paths:
       - '*.vsix'
