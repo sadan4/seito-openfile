@@ -34,8 +34,9 @@ package:
   stage: package
   script:
     - npm ci
-    - chown -R root /builds/fr43nk/seito-openfile
-    - npx vsce package
+    - chown -R root $CI_PROJECT_DIR
+    - npm i vsce
+    - vsce package
   artifacts:
     paths:
       - '*.vsix'
