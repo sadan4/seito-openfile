@@ -37,8 +37,7 @@ package:
     - npm ci
     - chown -R root $CI_PROJECT_DIR
     - npm i vsce
-    - vsce package
-  when: manual
+    - npx vsce package
   artifacts:
     paths:
       - '*.vsix'
@@ -49,7 +48,7 @@ package:
 publish_marketplace:
   stage: publish
   script:
-    - sudo -E npx vsce publish --packagePath *.vsix -p $AZURE_ACCESS_TOKEN
+    - npx vsce publish -p $AZURE_ACCESS_TOKEN
   rules:
     - if: '$CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+\-release/'
   release:
@@ -64,16 +63,3 @@ publish_open_vsx:
   when: manual
   only:
     - tags
-
-
-package-test:
-  script:
-    - npm ci
-    - chown -R root $CI_PROJECT_DIR
-    - npm i vsce
-    - npx vsce package
-  when: manual
-  artifacts:
-    paths:
-      - '*.vsix'
-    expire_in: 1 year
