@@ -8,7 +8,7 @@ stages:
 
 variables:
   BUILD_PATH: "/Unittests-tmp"
-  WS_ROOT: $CI_PROJECT_DIR$BUILD_PATH
+  WS_ROOT: $CI_PROJECT_DIR
 
 lint:
   stage: test
