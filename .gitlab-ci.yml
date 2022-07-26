@@ -7,8 +7,8 @@ stages:
   - publish
 
 variables:
-  WS_ROOT: "/builds/fr43nk/seito-openfile"
   BUILD_PATH: "/Unittests-tmp"
+  WS_ROOT: $CI_PROJECT_DIR$BUILD_PATH
 
 lint:
   stage: test
@@ -57,7 +57,7 @@ publish_marketplace:
 publish_open_vsx:
   stage: publish
   script:
-    - npx ovsx publish *.vsix -p $OPENVSX_ACCESS_TOKEN
+    - npx ovsx publish -p $OPENVSX_ACCESS_TOKEN
   when: manual
   only:
     - tags
