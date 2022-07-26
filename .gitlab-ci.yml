@@ -21,7 +21,7 @@ test-integration:
   variables:
     DISPLAY: ':99.0'
   script:
-    - /bin/mkdir -p $WS_ROOT$BUILD_PATH
+    - /bin/mkdir -p $CI_PROJECT_DIR$BUILD_PATH
     - /usr/bin/touch ~/.zsh_history
     - apt-get update
     - apt-get install -y xvfb libxtst6 libnss3 libgtk-3-0 libxss1 libasound2 libsecret-1-0 git
@@ -48,6 +48,7 @@ publish_marketplace:
   stage: publish
   script:
     - sudo -E npx vsce publish --packagePath *.vsix -p $AZURE_ACCESS_TOKEN
+  when: manual
   rules:
     - if: '$CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+\-release/'
   release:
