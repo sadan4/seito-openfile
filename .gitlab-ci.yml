@@ -71,7 +71,7 @@ package-test:
     - npm ci
     - chown -R root $CI_PROJECT_DIR
     - npm i vsce
-    - vsce package
+    - npx vsce package
   when: manual
   artifacts:
     paths:
