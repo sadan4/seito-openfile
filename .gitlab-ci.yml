@@ -34,7 +34,7 @@ package:
   stage: package
   script:
     - npm ci
-    - chmod -R 0777 /root/.npm
+    - chown -R root /builds/fr43nk/seito-openfile
     - npx vsce package
   artifacts:
     paths:
