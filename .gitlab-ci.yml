@@ -35,7 +35,6 @@ package:
   script:
     - npm ci
     - chmod -R 0777 /root/.npm
-    - npm install --global vsce
     - npx vsce package
   artifacts:
     paths:
