@@ -30,7 +30,7 @@ let files = [
 export function envSetup(): Promise<any>
 {
 	return new Promise<any>((resolve, reject) => {
-		console.log("Initialize!");
+		console.log("Initialize!", WS_ROOT);
 		try{
 			dirnames.forEach(dirname => {
 				if(!existsSync(dirname)){
