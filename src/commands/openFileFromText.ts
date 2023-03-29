@@ -195,7 +195,7 @@ export class OpenFileFromText {
 		if (isAbsolutePath || tryWorkspaceHomePath) {
 			p = this.getAbsolutePathFromFuzzyPathWithMultipleExtensions(inputPath, basePath, extensions, true);
 			if (p !== ''){
-				return "";
+				return p;
 			}
 
 			if (isAbsolutePath) {

@@ -85,7 +85,7 @@
           "description": "Known suffixes to look for when file string has no suffix (Deprecated. Default to search with current document's suffix if path in text has no extension)"
         },
         "seito-openfile.extraExtensionsForTypes": {
-          "type": "object",
+          "type": "array",
           "default": [
             {
               "name": "js",
