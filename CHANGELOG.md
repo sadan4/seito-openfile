@@ -1,5 +1,8 @@
 ## Release Notes
 
+### 1.8.10
+- fixed bug in configuration where the type was incorrect (thanks @drepamig)
+
 ### 1.8.9
 - fixed open file with Non-BMP characters
 
