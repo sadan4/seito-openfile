@@ -33,18 +33,21 @@ export function envSetup(): Promise<any>
 		console.log("Initialize!");
 		try{
 			dirnames.forEach(dirname => {
+				console.log(`Try creating directory: ${dirname}`)
 				if(!existsSync(dirname)){
+					console.log(`Creating dir ${dirname}`);
 					mkdirSync(dirname);
 				}
 			});
 		}
 		catch(error)
 		{
-			console.error("Error mkdir: ", error);
+			console.error(`Error mkdir: ${error}`);
 			reject();
 		}
 		try{
 			files.forEach(file => {
+				console.log(`Creating file ${file.name}`);
 				writeFileSync(file.name, file.content);
 			});
 		}
