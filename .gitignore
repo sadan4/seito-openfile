@@ -4,3 +4,4 @@ npm-debug.log*
 Unittests-tmp
 Unittests-common
 .DS_Store
+.vscode-test
