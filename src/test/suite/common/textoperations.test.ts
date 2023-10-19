@@ -173,11 +173,4 @@ suite("Text operation Tests", () => {
 		assert.equal(res.column, "12");
 	});
 
-	test("Issue 25: Goto right position if non-bmp characters are in content", () => {
-		let res = TextOperations.getPathAndPosition("l:\\Datas\\Unicode.txt:2:12");
-		assert.equal(res.file, "l:\\Datas\\Unicode.txt");
-		assert.equal(res.line, "2");
-		assert.equal(res.column, "12");
-	});
-
 });

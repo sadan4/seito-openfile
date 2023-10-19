@@ -21,6 +21,7 @@ test-integration:
   stage: test
   variables:
     DISPLAY: ':99.0'
+    MY_VAR: 'l:\Datas'
   script:
     - /bin/mkdir -p $CI_PROJECT_DIR$BUILD_PATH
     - /usr/bin/touch ~/.zsh_history

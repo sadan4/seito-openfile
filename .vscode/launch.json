@@ -22,7 +22,7 @@
 			"name": "Extension Tests",
 			"type": "extensionHost",
 			"request": "launch",
-			"env": {"WS_ROOT": "${workspaceRoot}"},
+			"env": {"WS_ROOT": "${workspaceRoot}", "MY_VAR": "l:\\Daten"},
 			"runtimeExecutable": "${execPath}",
 			"args": [
 				"--disable-extensions",

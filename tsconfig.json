@@ -1,21 +1,13 @@
 {
 	"compilerOptions": {
-		"target": "es6",
-		"lib": ["es2016"],
 		"module": "commonjs",
-		"outDir": "./out",
-		"rootDir": "./src",
-		"typeRoots": ["./node_modules/@types"],
-		"strict": true,
-		"experimentalDecorators": true,
+		"target": "ESNext",
+		"lib": ["es2020"],
+		"outDir": "out",
 		"sourceMap": true,
-		"noImplicitThis": false,
-		"moduleResolution": "node"
+		"strict": true,
+		"rootDir": "src"
 	},
-	"exclude": [
-		"node_modules",
-		".vscode-test",
-		"Unittests-common",
-    "Unittests-tmp"
-	]
+	"exclude": ["node_modules", ".vscode-test","Unittests-common",
+    "Unittests-tmp"]
 }
