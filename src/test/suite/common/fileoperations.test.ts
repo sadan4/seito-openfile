@@ -322,5 +322,11 @@ suite("File operation Tests", () => {
 		assert.equal(res, normalizeSlash(WS_ROOT + "\\Unittests-tmp\\src\\Class12"));
 	});
 
+	test("Issue 26: Using environment variables in path", () => {
+		let res = openFile.resolveEnvironmentVariableInPath("$MY_VAR\\Unicode.txt");
+		assert.equal(res, "l:\\Datas\\Unicode.txt");
+	});
+
+
 });
 

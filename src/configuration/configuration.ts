@@ -100,8 +100,8 @@ export class Configuration
 
 	set LookupTildePathAlsoFromWorkspace(yesNo: boolean)
 	{
-		if ( yesNo !== undefined)
-			this.m_lookupTildePathAlsoFromWorkspace = yesNo;
+		if ( yesNo !== undefined){
+			this.m_lookupTildePathAlsoFromWorkspace = yesNo;}
 	}
 
 	get LookupTildePathAlsoFromWorkspace(): boolean
@@ -111,8 +111,8 @@ export class Configuration
 
 	set LeadingPathMapping(mappings: { [ leadingPath : string ] : string })
 	{
-		if ( mappings !== undefined)
-			this.m_leadingPathMapping = mappings;
+		if ( mappings !== undefined){
+			this.m_leadingPathMapping = mappings;}
 	}
 
 	get LeadingPathMapping(): { [ leadingPath : string ] : string }
@@ -122,8 +122,8 @@ export class Configuration
 
 	set NotFoundTriggerQuickOpen(yesNo: boolean)
 	{
-		if ( yesNo !== undefined)
-			this.m_notFoundTriggerQuickOpen = yesNo;
+		if ( yesNo !== undefined){
+			this.m_notFoundTriggerQuickOpen = yesNo;}
 	}
 
 	get NotFoundTriggerQuickOpen(): boolean
@@ -133,8 +133,8 @@ export class Configuration
 
 	set OpenNewTab(yesNo: boolean)
 	{
-		if( yesNo !== undefined )
-			this.m_openNewTab = yesNo;
+		if( yesNo !== undefined ){
+			this.m_openNewTab = yesNo;}
 	}
 
 	get OpenNewTab(): boolean
