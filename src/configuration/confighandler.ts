@@ -77,6 +77,10 @@ export class ConfigHandler
 			{
 				this.m_configuration.OpenNewTab = config.get("openNewTab") as boolean;
 			}
+			if( config.has("defaultLinuxOpenCommand") === true )
+			{
+				this.m_configuration.DefaultLinuxOpenCommand = config.get("defaultLinuxOpenCommand") as string;
+			}
 		}
 	}
 }
