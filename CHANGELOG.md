@@ -1,5 +1,11 @@
 ## Release Notes
 
+### 2.0.0
+- Added the ability to open a file with its default external application
+  - a new configuration date has was added to set the default command for Linux environments `seito-openfile.defaultLinuxOpenCommand` is set to `xdg-open`
+- You can now open file string which include environment variables.
+  i.e. `$HOME/documents/myfile.txt`
+
 ### 1.8.10
 - fixed bug in configuration where the type was incorrect (thanks @drepamig)
 
