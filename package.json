@@ -2,7 +2,7 @@
   "name": "seito-openfile",
   "displayName": "Open file",
   "description": "Extract a filepath from the current cursor position and open the file",
-  "version": "1.8.10",
+  "version": "2.0.0",
   "publisher": "Fr43nk",
   "engines": {
     "vscode": "^1.25.0"
@@ -24,7 +24,7 @@
     "url": "https://gitlab.com/fr43nk/seito-openfile.git"
   },
   "activationEvents": [
-    "*"
+    "onStartupFinished"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -33,6 +33,11 @@
         "command": "seito-openfile.openFileFromText",
         "category": "File",
         "title": "Open file under cursor"
+      },
+      {
+        "command": "seito-openfile.openFileExternFromText",
+        "category": "File",
+        "title": "Open file in default application under cursor"
       },
       {
         "command": "seito-openfile.openFileLikeThisFile",
@@ -47,6 +52,11 @@
         "when": "editorTextFocus"
       },
       {
+        "command": "seito-openfile.openFileExternFromText",
+        "key": "ctrl+alt+p",
+        "when": "editorTextFocus"
+      },
+      {
         "command": "seito-openfile.openFileLikeThisFile",
         "key": "alt+q"
       }
@@ -56,11 +66,20 @@
         {
           "command": "seito-openfile.openFileFromText",
           "when": "seito-openfile:enabled"
+        },
+        {
+          "command": "seito-openfile.openFileExternFromText",
+          "when": "seito-openfile:enabled"
         }
       ],
       "editor/context": [
         {
           "command": "seito-openfile.openFileFromText",
+          "when": "editorTextFocus && !inOutput && seito-openfile:enabled",
+          "group": "file"
+        },
+        {
+          "command": "seito-openfile.openFileExternFromText",
           "when": "editorTextFocus && !inOutput && seito-openfile:enabled",
           "group": "file"
         }
@@ -78,6 +97,11 @@
           "type": "boolean",
           "default": false,
           "description": "Whether to lookup path string which start with '~' relative to workspace if not found at user's home."
+        },
+        "seito-openfile.defaultLinuxOpenCommand": {
+          "type": "string",
+          "default": "xdg-open",
+          "description": "Linux: Sets the default command to open a file with its associated application."
         },
         "seito-openfile.extensions": {
           "type": "array",

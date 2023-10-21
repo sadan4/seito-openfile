@@ -7,6 +7,7 @@ import { ConfigHandler } from "../configuration/confighandler";
 import { TextOperations } from "../common/textoperations";
 import { FileOperations } from "../common/fileoperations";
 import { Suffix } from "../types/suffix.type";
+import { exec } from "child_process";
 var glob = require("glob-all");
 var trueCasePathSync = require("true-case-path");
 
@@ -70,6 +71,26 @@ export class OpenFileFromText {
               );
             }
           });
+      }
+    }
+  }
+
+  public executeExtern() {
+    if (this.editor === undefined) {
+      return;
+    }
+    let numSelections = this.editor.selections.length;
+    let isOpeningMultipleFiles = numSelections > 1; // if there are more than 1 file to open, open in new tab for all.
+    for (let i: number = 0; i < numSelections; i++) {
+      let words = this.getWordRanges(this.editor.selections[i]);
+      if (words === undefined) {
+        continue;
+      }
+      if (!isOpeningMultipleFiles && words.length > 1) {
+        isOpeningMultipleFiles = true;
+      }
+      for (let word of words) {
+        this.openDocumentExternal(word);
       }
     }
   }
@@ -166,6 +187,9 @@ export class OpenFileFromText {
 
     // Normalize \ to / in the file string (\ not work for existsSync on linux-like), to support e.g. "use namespace\Class;" with path path/to/class/namespace/Class.php in PHP.
     inputPath = inputPath.replace(/\\/g, "/");
+    // in case of spaces in file path, mask them with back
+    // inputPath = inputPath.replace(/[\s]+/g, "\\ ");
+
     let isAbsolutePath = isAbsolute(inputPath);
     let isSlashAbsolutePath =
       isAbsolutePath && inputPath.match(/^[\/\\][^\/\\]/);
@@ -481,6 +505,36 @@ export class OpenFileFromText {
       } else {
         reject("File not found");
       }
+    });
+  }
+
+  public openDocumentExternal(
+    iWord: string
+  ): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      if (iWord === undefined || iWord === "") {
+        reject("Path is empty");
+      }
+
+      let fileAndLine = TextOperations.getPathAndPosition(iWord);
+      let p = this.resolvePath(fileAndLine.file);
+      if (p !== "") {
+
+        switch(process.platform) {
+          case 'win32':
+            exec(`start ${p}`);
+            break;
+          case 'darwin':
+            p = p.replace(/(\s+)/g, '\\$1');
+            exec(`open ${p}`);
+            break;
+          default:
+            p = p.replace(/(\s+)/g, '\\$1');
+            const c = this.configHandler.Configuration.DefaultLinuxOpenCommand;
+            exec(`${c} ${p}`);
+        }
+      }
+      resolve(true);
     });
   }
 

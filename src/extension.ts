@@ -25,6 +25,9 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('seito-openfile.openFileFromText', openFile.execute, openFile)
     );
     context.subscriptions.push(
+        vscode.commands.registerCommand('seito-openfile.openFileExternFromText', openFile.executeExtern, openFile)
+    );
+    context.subscriptions.push(
         vscode.commands.registerCommand('seito-openfile.openFileLikeThisFile', OpenFileLikeThisFile.execute, OpenFileLikeThisFile)
     );
 }
