@@ -14,6 +14,7 @@ export class Configuration
 	private m_leadingPathMapping: { [ leadingPath : string ] : string };
 	private m_notFoundTriggerQuickOpen: boolean;
 	private m_openNewTab: boolean;
+	private m_defaultLinuxOpenCmd: string;
 
 	public constructor()
 	{
@@ -26,6 +27,7 @@ export class Configuration
 		this.m_leadingPathMapping = {};
 		this.m_notFoundTriggerQuickOpen = true;
 		this.m_openNewTab = false;
+		this.m_defaultLinuxOpenCmd = "xdg-open";
 	}
 
 	get Bound(): RegExp
@@ -140,5 +142,15 @@ export class Configuration
 	get OpenNewTab(): boolean
 	{
 		return this.m_openNewTab;
+	}
+
+	set DefaultLinuxOpenCommand(cmd: string) {
+		if( cmd && cmd !== "" ) {
+			this.m_defaultLinuxOpenCmd = cmd;
+		}
+	}
+
+	get DefaultLinuxOpenCommand(): string {
+		return this.m_defaultLinuxOpenCmd;
 	}
 }
