@@ -26,7 +26,7 @@
   "activationEvents": [
     "onStartupFinished"
   ],
-  "main": "./out/extension.js",
+  "main": "./dist/extension",
   "contributes": {
     "commands": [
       {
@@ -209,14 +209,18 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "lint": "eslint src --ext ts",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "test": "node ./out/test/runTest.js",
     "test-unit": "npm run compile && mocha ./out/test/suite/**.test.js",
-    "test-integration": "npm run compile && node ./out/test/runTest.js"
+    "test-integration": "npm run compile && node ./out/test/runTest.js",
+    "vscode:prepublish": "npm run package",
+    "webpack": "webpack --mode development",
+    "webpack-dev": "webpack --mode development --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "test-compile": "tsc -p ./"
   },
   "devDependencies": {
     "@types/glob": "^7.2.0",
@@ -227,9 +231,12 @@
     "@vscode/test-electron": "^2.1.5",
     "eslint": "^6.8.0",
     "glob": "^7.2.3",
-    "mocha": "^7.2.0",
+    "mocha": "^10.2.0",
+    "ts-loader": "^9.5.0",
     "typescript": "^3.9.10",
-    "vscode": "^1.1.37"
+    "vscode": "^1.1.34",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
   },
   "dependencies": {
     "glob-all": "^3.3.0",
