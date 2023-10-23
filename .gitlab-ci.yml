@@ -30,20 +30,20 @@ test-new:
       xvfb-run -a npm run test
 
 
-test-integration:
-  stage: test
-  variables:
-    DISPLAY: ':99.0'
-    MY_VAR: 'l:\Datas'
-  script:
-    - /bin/mkdir -p $CI_PROJECT_DIR$BUILD_PATH
-    - /usr/bin/touch ~/.zsh_history
-    - apt-get update
-    - apt-get install -y xvfb libxtst6 libnss3 libgtk-3-0 libgbm-dev libxss1 libasound2 libsecret-1-0 git dbus
-    - npm ci
-    - echo $DISPLAY
-    - /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-    - yarn && yarn compile && yarn test
+# test-integration:
+#   stage: test
+#   variables:
+#     DISPLAY: ':99.0'
+#     MY_VAR: 'l:\Datas'
+#   script:
+#     - /bin/mkdir -p $CI_PROJECT_DIR$BUILD_PATH
+#     - /usr/bin/touch ~/.zsh_history
+#     - apt-get update
+#     - apt-get install -y xvfb libxtst6 libnss3 libgtk-3-0 libgbm-dev libxss1 libasound2 libsecret-1-0 git dbus
+#     - npm ci
+#     - echo $DISPLAY
+#     - /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+#     - yarn && yarn compile && yarn test
 
 package:
   stage: package
