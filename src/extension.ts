@@ -8,13 +8,13 @@ import {OpenFileLikeThisFile} from './commands/openFileLikeThisFile';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+export function activate(context: vscode.ExtensionContext): void {
 
     vscode.commands.executeCommand("setContext", "seito-openfile:enabled", true);
 
     console.log("seito-openfile extension started");
-    let configHandler: ConfigHandler = ConfigHandler.Instance;
-    let openFile: OpenFileFromText = new OpenFileFromText(
+    const configHandler: ConfigHandler = ConfigHandler.Instance;
+    const openFile: OpenFileFromText = new OpenFileFromText(
         vscode.window.activeTextEditor, configHandler);
 
     context.subscriptions.push(
@@ -33,5 +33,5 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {
+export function deactivate(): void {
 }
