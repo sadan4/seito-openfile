@@ -1,8 +1,7 @@
-image: node:18-slim
-
+image: node:12-buster
 
 stages:
-  - test
+  - testnew
   - package
   - publish
 
@@ -16,6 +15,20 @@ lint:
     - echo $CI_BUILDS_DIR
     - npm ci
     - npm run lint
+
+test-new
+  stage: testnew
+  variables:
+    DISPLAY: ':99.0'
+    MY_VAR: 'l:\Datas'
+  before_script:
+    - npm install
+  script:
+    - |
+      apt update
+      apt install -y libasound2 libgbm1 libgtk-3-0 libnss3 xvfb
+      xvfb-run -a npm run test
+
 
 test-integration:
   stage: test
