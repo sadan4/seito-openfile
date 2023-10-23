@@ -10,13 +10,13 @@ variables:
   WS_ROOT: $CI_PROJECT_DIR
 
 lint:
-  stage: test
+  stage: testnew
   script:
     - echo $CI_BUILDS_DIR
     - npm ci
     - npm run lint
 
-test-new
+test-new:
   stage: testnew
   variables:
     DISPLAY: ':99.0'
