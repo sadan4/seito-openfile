@@ -18,6 +18,11 @@
 			}
 		},
 		{
+			"label": "create test workspace",
+			"type":"shell",
+			"command": "mkdir ${workspaceRoot}/Unittests-tmp"
+		},
+		{
 			"type": "npm",
 			"script": "watch-tests",
 			"problemMatcher": "$tsc-watch",
@@ -31,6 +36,7 @@
 		{
 			"label": "tasks: watch-tests",
 			"dependsOn": [
+				"create test workspace",
 				"npm: watch",
 				"npm: watch-tests"
 			],

@@ -24,9 +24,9 @@
 			"request": "launch",
 			"env": {"WS_ROOT": "${workspaceRoot}", "MY_VAR": "l:\\Datas"},
 			"args": [
+				"${workspaceRoot}/Unittests-tmp",
 				"--extensionDevelopmentPath=${workspaceFolder}",
-				"--extensionTestsPath=${workspaceFolder}/out/test/suite/index",
-				"${workspaceRoot}/Unittests-tmp" 
+				"--extensionTestsPath=${workspaceFolder}/out/test/suite/index"
 			],
 			"outFiles": [
 				"${workspaceFolder}/out/**/*.js",

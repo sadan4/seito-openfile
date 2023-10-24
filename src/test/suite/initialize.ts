@@ -5,6 +5,7 @@ import {
   rmdirSync,
   existsSync,
 } from "fs";
+import { Uri, workspace } from "vscode";
 
 let WS_ROOT = process.env.WS_ROOT;
 if (WS_ROOT === undefined) {
@@ -59,8 +60,12 @@ export async function envSetup(): Promise<any> {
   }
   try {
     files.forEach((file) => {
-      console.log(`Creating file ${file.name}`);
       writeFileSync(file.name, file.content);
+      if(!existsSync(file.name)) {
+        throw new Error(`${file.name} does not exist!`);
+      } else {
+        console.log(`Creating file ${file.name}`);
+      }
     });
   } catch (error: any) {
     console.error("Error create file: ", error);

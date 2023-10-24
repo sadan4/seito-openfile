@@ -37,7 +37,7 @@ suite("File operation Tests", () => {
 
 	test("** " + WS_ROOT + "/Unittests-tmp must exists before run tests, and match exact case", () => {
 		if( WS_ROOT === undefined ){
-			assert.fail(null, null,"WS_ROOT is undefined");
+			assert.fail("WS_ROOT is undefined");
 		}
 		assert.equal(true, existsSync(WS_ROOT + "/Unittests-tmp"));
 		assert.equal(true, lstatSync(WS_ROOT + "/Unittests-tmp").isDirectory());
@@ -229,7 +229,9 @@ suite("File operation Tests", () => {
 	});
 	test("resolvePath, resolve path to parent folder", () => {
 		const res = openFile.resolvePath("test.scss", WS_ROOT + "/Unittests-tmp/test/dir1/testcase2.ts");
-		assert.equal(res, normalizeSlash(WS_ROOT + "\\Unittests-tmp\\test\\test.scss"));
+		const set = normalizeSlash(WS_ROOT + "\\Unittests-tmp\\test\\test.scss");
+		console.log("res: ", res, " set ", set);
+		assert.equal(res, set);
 	});
 	test("resolvePath, resolve path to workspace src folder, without file extension", () => {
 		ConfigHandler.Instance.Configuration.SearchPaths = [WS_ROOT + '/', `${WS_ROOT}/Unittests-tmp/`, `${WS_ROOT}/Unittests-common/`];
