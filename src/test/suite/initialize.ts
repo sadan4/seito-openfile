@@ -5,7 +5,6 @@ import {
   rmdirSync,
   existsSync,
 } from "fs";
-import { Uri, workspace } from "vscode";
 
 let WS_ROOT = process.env.WS_ROOT;
 if (WS_ROOT === undefined) {
