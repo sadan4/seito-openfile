@@ -21,6 +21,8 @@ test-new:
   variables:
     DISPLAY: ':99.0'
     MY_VAR: 'l:\Datas'
+    WS_ROOT: $CI_PROJECT_DIR
+    BUILD_PATH: "/Unittests-tmp"
   before_script:
     - npm install
   script:
