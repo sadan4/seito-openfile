@@ -27,6 +27,7 @@ test-new:
     - npm install
   script:
     - |
+      /bin/mkdir -p $CI_PROJECT_DIR$BUILD_PATH
       apt update
       apt install -y libasound2 libgbm1 libgtk-3-0 libnss3 xvfb
       xvfb-run -a npm run test
