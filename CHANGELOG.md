@@ -1,5 +1,9 @@
 ## Release Notes
 
+### 2.0.1
+- Internal code management
+- extension now is a bundled extension
+
 ### 2.0.0
 - Added the ability to open a file with its default external application
   - a new configuration date has was added to set the default command for Linux environments `seito-openfile.defaultLinuxOpenCommand` is set to `xdg-open`
