@@ -20,7 +20,7 @@
 		{
 			"label": "create test workspace",
 			"type":"shell",
-			"command": "mkdir ${workspaceRoot}/Unittests-tmp"
+			"command": "mkdir -p ${workspaceRoot}/Unittests-tmp"
 		},
 		{
 			"type": "npm",
