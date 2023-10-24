@@ -216,7 +216,8 @@
     "compile": "webpack --mode production && npm run test-compile",
     "test-compile": "tsc -p ./",
     "test": "tsc -p ./ && node ./out/test/runTest.js",
-    "lint": "eslint src --ext ts"
+    "lint": "eslint src --ext ts",
+    "watch-tests": "tsc -p . -w --outDir out"
   },
   "devDependencies": {
     "@types/glob": "^7.2.0",
