@@ -1,11 +1,5 @@
-'use strict';
-
-import * as vscode from 'vscode';
 import {dirname,join,isAbsolute} from 'path';
 import {existsSync,statSync} from 'fs';
-import { ConfigHandler } from '../configuration/confighandler';
-import { Configuration } from '../configuration/configuration';
-
 
 export class FileOperations
 {
@@ -19,7 +13,7 @@ export class FileOperations
 			if( iPath[0] === "~" )
 			{
 				iCurrPath = this.getAbsoluteHomePath();
-				iPath = iPath.substr(1);
+				iPath = iPath.substring(1);
 			}
 			else if( isAbsolute(iPath) )
 				return join(iPath);
@@ -82,7 +76,7 @@ export class FileOperations
 		let retVal = "";
 		let f = fileName;
 		let p = path;
-		if( fileName.lastIndexOf(".") == -1 )
+		if( fileName.lastIndexOf(".") === -1 )
 		{
 			if (iSuffix !== '') {	// iSuffix may be empty now
 				f += "." + iSuffix;
@@ -96,7 +90,7 @@ export class FileOperations
 		retVal = this.getAbsoluteFromRelativePath(p, iCurrPath, baseMustBeDir);
 		if(!existsSync(retVal))
 		{
-			if( fileName.indexOf("_") == -1 || fileName.indexOf("_") > 0 )
+			if( (!fileName.includes("_")) || (fileName.indexOf("_") > 0) )
 			{
 				f = "_" + f;
 				p = path + f;
@@ -110,8 +104,8 @@ export class FileOperations
 
 	public static getAbsoluteHomePath(): string
 	{
-		let prof = (process.platform === 'win32') ? 'USERPROFILE' : 'HOME';
-		let p = process.env[prof];
+		const prof = (process.platform === 'win32') ? 'USERPROFILE' : 'HOME';
+		const p = process.env[prof];
 		if( p === undefined ) 
 			return "";
 		return p;

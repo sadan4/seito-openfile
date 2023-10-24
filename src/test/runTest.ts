@@ -1,12 +1,11 @@
-import { existsSync, mkdirSync } from 'fs';
 import * as path from 'path';
 
 import { runTests } from '@vscode/test-electron';
 
-async function main() {
+async function main():Promise<void> {
 	try {
-		// const wsRoot = process.env.WSROOT ? process.env.WSROOT : "";
-		const wsRoot = "/builds/fr43nk/seito-openfile/Unittests-tmp";
+		const wsRoot = (process.env.WS_ROOT ?? "") + "/Unittests-tmp";
+		// const wsRoot = "/builds/fr43nk/seito-openfile/Unittests-tmp";
 		console.log(`Workspace root: ${wsRoot}`);
 		
 		// The folder containing the Extension Manifest package.json
