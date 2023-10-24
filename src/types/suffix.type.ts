@@ -3,7 +3,7 @@ export class Suffix {
 	public suffixes: string[];
 
 	public constructor() {
-		this.name = ""
+		this.name = "";
 		this.suffixes = [];
 	}
 }

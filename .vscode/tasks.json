@@ -4,13 +4,13 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "defaultBuildTask",
 			"type": "npm",
-			"script": "compile",
-			"problemMatcher": "$tsc-watch",
+			"script": "watch",
+			"problemMatcher": "$ts-webpack-watch",
 			"isBackground": true,
 			"presentation": {
-				"reveal": "never"
+				"reveal": "never",
+				"group": "watchers"
 			},
 			"group": {
 				"kind": "build",
@@ -18,14 +18,29 @@
 			}
 		},
 		{
-			"label": "createDir",
-			"type": "shell",
-			"command": "mkdir",
-			"args": ["${workspaceFolder}/Unittests-tmp"],
+			"label": "create test workspace",
+			"type":"shell",
+			"command": "mkdir -p ${workspaceRoot}/Unittests-tmp"
 		},
 		{
-			"label": "testtask",
-			"dependsOn": ["createDir", "defaultBuildTask"]
+			"type": "npm",
+			"script": "watch-tests",
+			"problemMatcher": "$tsc-watch",
+			"isBackground": true,
+			"presentation": {
+				"reveal": "never",
+				"group": "watchers"
+			},
+			"group": "build"
+		},
+		{
+			"label": "tasks: watch-tests",
+			"dependsOn": [
+				"create test workspace",
+				"npm: watch",
+				"npm: watch-tests"
+			],
+			"problemMatcher": []
 		}
 	]
 }

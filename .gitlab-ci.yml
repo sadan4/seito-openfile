@@ -1,8 +1,7 @@
-image: node:16-slim
-
+image: node:20-buster
 
 stages:
-  - test
+  - testnew
   - package
   - publish
 
@@ -11,26 +10,43 @@ variables:
   WS_ROOT: $CI_PROJECT_DIR
 
 lint:
-  stage: test
+  stage: testnew
   script:
     - echo $CI_BUILDS_DIR
     - npm ci
     - npm run lint
 
-test-integration:
-  stage: test
+test-new:
+  stage: testnew
   variables:
     DISPLAY: ':99.0'
     MY_VAR: 'l:\Datas'
+    WS_ROOT: $CI_PROJECT_DIR
+    BUILD_PATH: "/Unittests-tmp"
+  before_script:
+    - npm install
   script:
-    - /bin/mkdir -p $CI_PROJECT_DIR$BUILD_PATH
-    - /usr/bin/touch ~/.zsh_history
-    - apt-get update
-    - apt-get install -y xvfb libxtst6 libnss3 libgtk-3-0 libgbm-dev libxss1 libasound2 libsecret-1-0 git
-    - npm ci
-    - echo $DISPLAY
-    - /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-    - yarn test-integration
+    - |
+      /bin/mkdir -p $CI_PROJECT_DIR$BUILD_PATH
+      apt update
+      apt install -y libasound2 libgbm1 libgtk-3-0 libnss3 xvfb
+      xvfb-run -a npm run test
+
+
+# test-integration:
+#   stage: test
+#   variables:
+#     DISPLAY: ':99.0'
+#     MY_VAR: 'l:\Datas'
+#   script:
+#     - /bin/mkdir -p $CI_PROJECT_DIR$BUILD_PATH
+#     - /usr/bin/touch ~/.zsh_history
+#     - apt-get update
+#     - apt-get install -y xvfb libxtst6 libnss3 libgtk-3-0 libgbm-dev libxss1 libasound2 libsecret-1-0 git dbus
+#     - npm ci
+#     - echo $DISPLAY
+#     - /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+#     - yarn && yarn compile && yarn test
 
 package:
   stage: package

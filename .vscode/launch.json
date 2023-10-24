@@ -14,26 +14,25 @@
 				"--extensionDevelopmentPath=${workspaceFolder}"
 			],
 			"outFiles": [
-				"${workspaceFolder}/out/**/*.js"
+				"${workspaceFolder}/dist/**/*.js"
 			],
-			"preLaunchTask": "${defaultBuildTask}"
+			"preLaunchTask": "npm: webpack"
 		},
 		{
 			"name": "Extension Tests",
 			"type": "extensionHost",
 			"request": "launch",
-			"env": {"WS_ROOT": "${workspaceRoot}", "MY_VAR": "l:\\Daten"},
-			"runtimeExecutable": "${execPath}",
+			"env": {"WS_ROOT": "${workspaceRoot}", "MY_VAR": "l:\\Datas"},
 			"args": [
-				"--disable-extensions",
+				"${workspaceRoot}/Unittests-tmp",
 				"--extensionDevelopmentPath=${workspaceFolder}",
-				"--extensionTestsPath=${workspaceFolder}/out/test/suite/index",
-				"${workspaceRoot}/Unittests-tmp" 
+				"--extensionTestsPath=${workspaceFolder}/out/test/suite/index"
 			],
 			"outFiles": [
-				"${workspaceFolder}/out/test/**/*.js"
+				"${workspaceFolder}/out/**/*.js",
+				"${workspaceFolder}/dist/**/*.js"
 			],
-			"preLaunchTask": "testtask"
+			"preLaunchTask": "tasks: watch-tests"
 		}
 	]
 }
