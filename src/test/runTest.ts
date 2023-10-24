@@ -4,7 +4,7 @@ import { runTests } from '@vscode/test-electron';
 
 async function main():Promise<void> {
 	try {
-		const wsRoot = (process.env.WSROOT ?? "") + "/Unittests-tmp";
+		const wsRoot = (process.env.WS_ROOT ?? "") + "/Unittests-tmp";
 		// const wsRoot = "/builds/fr43nk/seito-openfile/Unittests-tmp";
 		console.log(`Workspace root: ${wsRoot}`);
 		
