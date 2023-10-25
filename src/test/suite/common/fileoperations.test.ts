@@ -324,6 +324,18 @@ suite("File operation Tests", () => {
 		const res = openFile.resolveEnvironmentVariableInPath("$MY_VAR\\Unicode.txt");
 		assert.equal(res, "l:\\Datas\\Unicode.txt");
 	});
+	test("Issue 29: Using environment variables in path (%VAR%)", () => {
+		const res = openFile.resolveEnvironmentVariableInPath("%MY_VAR%\\Unicode.txt");
+		assert.equal(res, "l:\\Datas\\Unicode.txt");
+	});
+	test("Issue 29: Using environment variables in path (${VAR})", () => {
+		const res = openFile.resolveEnvironmentVariableInPath("${MY_VAR}\\Unicode.txt");
+		assert.equal(res, "l:\\Datas\\Unicode.txt");
+	});
+	test("Issue 29: Using environment variables in path (${VAR)", () => {
+		const res = openFile.resolveEnvironmentVariableInPath("${MY_VAR\\Unicode.txt");
+		assert.equal(res, "l:\\Datas\\Unicode.txt");
+	});
 
 
 });
