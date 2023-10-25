@@ -1,5 +1,8 @@
 ## Release Notes
 
+### 2.1.0
+- Extended environment variable detection to windows compative syntax, i.e. %var%
+
 ### 2.0.1
 - Internal code management
 - extension now is a bundled extension
