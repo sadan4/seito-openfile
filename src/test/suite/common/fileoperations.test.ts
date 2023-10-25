@@ -328,7 +328,9 @@ suite("File operation Tests", () => {
 		const res = openFile.resolveEnvironmentVariableInPath("%MY_VAR%\\Unicode.txt");
 		assert.equal(res, "l:\\Datas\\Unicode.txt");
 	});
+	// eslint-disable-next-line no-template-curly-in-string
 	test("Issue 29: Using environment variables in path (${VAR})", () => {
+		// eslint-disable-next-line no-template-curly-in-string
 		const res = openFile.resolveEnvironmentVariableInPath("${MY_VAR}\\Unicode.txt");
 		assert.equal(res, "l:\\Datas\\Unicode.txt");
 	});
