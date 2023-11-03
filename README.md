@@ -20,7 +20,10 @@ In that file the path strings could look like as follows:
 [...]
  "..\user\readme.txt:33"
 [...]
+ "my\path"
 ```
+
+In case of the string leads to a path it will be opened in the default file manager.
 
 With this extension you can right-click on such a path and choose ```open file under cursor``` and VSCode will open a new tab with that file.
 
