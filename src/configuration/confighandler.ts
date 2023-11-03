@@ -73,6 +73,9 @@ export class ConfigHandler {
       if (config.has("openNewTab")) {
         this.m_configuration.OpenNewTab = config.get("openNewTab") as boolean;
       }
+      if (config.has("preferOpenFile")) {
+        this.m_configuration.PreferOpenFile = config.get("preferOpenFile") as boolean;
+      }
       if (config.has("defaultLinuxOpenCommand")) {
         this.m_configuration.DefaultLinuxOpenCommand = config.get(
           "defaultLinuxOpenCommand"
