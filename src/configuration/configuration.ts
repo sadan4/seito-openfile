@@ -10,6 +10,7 @@ export class Configuration {
   private m_leadingPathMapping: Record<string, string>;
   private m_notFoundTriggerQuickOpen: boolean;
   private m_openNewTab: boolean;
+  private m_preferOpenFile: boolean;
   private m_defaultLinuxOpenCmd: string;
 
   public constructor() {
@@ -22,6 +23,7 @@ export class Configuration {
     this.m_leadingPathMapping = {};
     this.m_notFoundTriggerQuickOpen = true;
     this.m_openNewTab = false;
+    this.m_preferOpenFile = true;
     this.m_defaultLinuxOpenCmd = "xdg-open";
   }
 
@@ -118,6 +120,14 @@ export class Configuration {
 
   get OpenNewTab(): boolean {
     return this.m_openNewTab;
+  }
+
+  set PreferOpenFile(val: boolean) {
+    this.m_preferOpenFile = val;
+  }
+
+  get PreferOpenFile(): boolean {
+    return this.m_preferOpenFile;
   }
 
   set DefaultLinuxOpenCommand(cmd: string) {
