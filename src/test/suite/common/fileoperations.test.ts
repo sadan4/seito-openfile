@@ -338,6 +338,20 @@ suite("File operation Tests", () => {
 		const res = openFile.resolveEnvironmentVariableInPath("${MY_VAR\\Unicode.txt");
 		assert.equal(res, "l:\\Datas\\Unicode.txt");
 	});
+	test("Issue 30: Open in file explorer if path string is just a path", () => {
+		ConfigHandler.Instance.Configuration.SearchPaths = [WS_ROOT + '/'];
+		ConfigHandler.Instance.Configuration.PreferOpenFile = false;
+		const res = openFile.resolvePath("/Unittests-tmp/test/dir1/", WS_ROOT + "/Unittests-tmp/test/dir1/testcase2.ts");
+		const res1 = openFile.checkIfPathIsFolder(res);
+		assert.equal(true, res1);
+	});
+	test("Issue 30: Open in file explorer if path string is just a relative path to workspace", () => {
+		ConfigHandler.Instance.Configuration.SearchPaths = [WS_ROOT + '/'];
+		ConfigHandler.Instance.Configuration.PreferOpenFile = false;
+		const res = openFile.resolvePath("Unittests-tmp/test/dir1/", WS_ROOT + "/Unittests-tmp/test/dir1/testcase2.ts");
+		const res1 = openFile.checkIfPathIsFolder(res);
+		assert.equal(true, res1);
+	});
 
 
 });

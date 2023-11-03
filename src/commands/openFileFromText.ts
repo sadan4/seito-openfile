@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { dirname, extname, join, isAbsolute } from "path";
-import { existsSync, lstatSync, accessSync, constants } from "fs";
+import { existsSync, lstatSync, accessSync, constants, statSync } from "fs";
 import { type ConfigHandler } from "../configuration/confighandler";
 import { TextOperations } from "../common/textoperations";
 import { FileOperations } from "../common/fileoperations";
@@ -8,7 +8,7 @@ import { type Suffix } from "../types/suffix.type";
 import { exec } from "child_process";
 import { globSync } from "glob";
 // var glob = require('glob-all')
-import {trueCasePathSync} from 'true-case-path';
+import { trueCasePathSync } from "true-case-path";
 
 export class OpenFileFromText {
   // private m_currFile: vscode.Uri;
@@ -207,7 +207,11 @@ export class OpenFileFromText {
       basePath,
       true
     );
-    if (existsSync(p) && lstatSync(p).isFile()) {
+    const prefOpenFile = this.configHandler.Configuration.PreferOpenFile;
+    if (
+      existsSync(p) &&
+      (lstatSync(p).isFile() || (!prefOpenFile && lstatSync(p).isDirectory()))
+    ) {
       return p;
     }
     try {
@@ -305,6 +309,12 @@ export class OpenFileFromText {
         );
         if (p !== "") {
           return p;
+        } else {
+          // no file found, path exists within the workspace, so open it
+          const _p = join(basePath,inputPath);
+          if( existsSync(_p) && lstatSync(_p).isDirectory() ) {
+            return _p;
+          }
         }
         if (
           finalConditionRe.test(basePath) ||
@@ -393,12 +403,15 @@ export class OpenFileFromText {
       if (existsSync(p) && lstatSync(p).isFile()) {
         return p;
       } else {
-        p = FileOperations.getAbsoluteFromAlwaysRelativePath(
+        const pNew = FileOperations.getAbsoluteFromAlwaysRelativePath(
           inputPath + assumeExt,
           join(folder),
           true
         );
-        if (existsSync(p) && lstatSync(p).isFile()) {
+        if (existsSync(pNew) && lstatSync(pNew).isFile()) {
+          return pNew;
+        }
+        if (existsSync(p) && lstatSync(p).isDirectory()) {
           return p;
         }
       }
@@ -406,13 +419,20 @@ export class OpenFileFromText {
     return "";
   }
 
-  public async openDocument(iWord: string, iForceNewTab: boolean = false): Promise<string> {
+  public async openDocument(
+    iWord: string,
+    iForceNewTab: boolean = false
+  ): Promise<string> {
     if (iWord === undefined || iWord === "") {
       throw new Error("Path is empty");
     }
 
     const fileAndLine = TextOperations.getPathAndPosition(iWord);
     let p = this.resolvePath(fileAndLine.file);
+    if (this.checkIfPathIsFolder(p)) {
+      this.executeAsExternalCmd(p);
+      return await Promise.resolve(p);
+    }
     if (p !== "") {
       p = trueCasePathSync(p); // Avoid open document as non-matching case.  E.g. input text is "Extension.js" but real file name is extension.js, without this code, file opened and shown as "Extension.js" on Windows because file name are case insensitive.
       try {
@@ -488,28 +508,34 @@ export class OpenFileFromText {
     }
   }
 
-  public async openDocumentExternal(iWord: string): Promise<string|boolean> {
-      if (iWord === undefined || iWord === "") {
-        throw new Error("Path is empty");
-      }
+  public async openDocumentExternal(iWord: string): Promise<string | boolean> {
+    if (iWord === undefined || iWord === "") {
+      throw new Error("Path is empty");
+    }
 
-      const fileAndLine = TextOperations.getPathAndPosition(iWord);
-      let p = this.resolvePath(fileAndLine.file);
-      if (p !== "") {
-        switch (process.platform) {
-          case "win32":
-            exec(`start ${p}`);
-            break;
-          case "darwin":
-            p = p.replace(/(\s+)/g, "\\$1");
-            exec(`open ${p}`);
-            break;
-          default:
-            p = p.replace(/(\s+)/g, "\\$1");
-            exec(`${this.configHandler.Configuration.DefaultLinuxOpenCommand} ${p}`);
-        }
+    const fileAndLine = TextOperations.getPathAndPosition(iWord);
+    const p = this.resolvePath(fileAndLine.file);
+    this.executeAsExternalCmd(p);
+    return await Promise.resolve(true);
+  }
+
+  private executeAsExternalCmd(p: string): void {
+    if (p !== "") {
+      switch (process.platform) {
+        case "win32":
+          exec(`start ${p}`);
+          break;
+        case "darwin":
+          p = p.replace(/(\s+)/g, "\\$1");
+          exec(`open ${p}`);
+          break;
+        default:
+          p = p.replace(/(\s+)/g, "\\$1");
+          exec(
+            `${this.configHandler.Configuration.DefaultLinuxOpenCommand} ${p}`
+          );
       }
-      return await Promise.resolve(true);
+    }
   }
 
   public getAbsolutePathFromFuzzyPathWithMultipleExtensions(
@@ -536,11 +562,10 @@ export class OpenFileFromText {
   public getWordRanges(
     selection: vscode.Selection,
     iDocument?: vscode.TextDocument
-  ): string[]|undefined {
+  ): string[] | undefined {
     let line: string;
     let start: vscode.Position;
-    const document =
-      iDocument ?? this.editor?.document;
+    const document = iDocument ?? this.editor?.document;
     if (document === undefined) {
       return;
     }
@@ -578,5 +603,17 @@ export class OpenFileFromText {
       }
     }
     return newPath;
+  }
+
+  public checkIfPathIsFolder(inputPath: string): boolean {
+    if (inputPath !== undefined && inputPath !== "") {
+      try {
+        const fsStats = statSync(inputPath);
+        return fsStats.isDirectory();
+      } catch (error) {
+        return false;
+      }
+    }
+    return false;
   }
 }

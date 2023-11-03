@@ -103,6 +103,11 @@
           "default": "xdg-open",
           "description": "Linux: Sets the default command to open a file with its associated application."
         },
+        "seito-openfile.preferOpenFile": {
+          "type": "boolean",
+          "default": "true",
+          "description": "If a file without suffix and a folder are named the same in the same location prefer open the file."
+        },
         "seito-openfile.extensions": {
           "type": "array",
           "default": [],
