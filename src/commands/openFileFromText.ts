@@ -395,7 +395,7 @@ export class OpenFileFromText {
       ? []
       : this.configHandler.Configuration.SearchPaths;
     for (const folder of searchPaths) {
-      let p = FileOperations.getAbsoluteFromAlwaysRelativePath(
+      const p = FileOperations.getAbsoluteFromAlwaysRelativePath(
         inputPath,
         join(folder),
         true
