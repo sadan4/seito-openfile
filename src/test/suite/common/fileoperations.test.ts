@@ -336,6 +336,12 @@ suite("File operation Tests", () => {
 	});
 	test("Issue 29: Using environment variables in path (${VAR)", () => {
 		const res = openFile.resolveEnvironmentVariableInPath("${MY_VAR\\Unicode.txt");
+		assert.equal(res, "${MY_VAR\\Unicode.txt");
+	});
+	// eslint-disable-next-line no-template-curly-in-string
+	test("Issue 29: Using environment variables in path multiple positions (${VAR})", () => {
+		// eslint-disable-next-line no-template-curly-in-string
+		const res = openFile.resolveEnvironmentVariableInPath("${MY_VAR}\\${MY_VAR2}.txt");
 		assert.equal(res, "l:\\Datas\\Unicode.txt");
 	});
 	test("Issue 30: Open in file explorer if path string is just a path", () => {
@@ -351,6 +357,12 @@ suite("File operation Tests", () => {
 		const res = openFile.resolvePath("Unittests-tmp/test/dir1/", WS_ROOT + "/Unittests-tmp/test/dir1/testcase2.ts");
 		const res1 = openFile.checkIfPathIsFolder(res);
 		assert.equal(true, res1);
+	});
+	// eslint-disable-next-line no-template-curly-in-string
+	test("Issue 31: Using multiple environment variables in string", () => {
+		// eslint-disable-next-line no-template-curly-in-string
+		const res = openFile.resolveEnvironmentVariableInPath("${HOME}/folder/config-${ENV}.ini");
+		assert.equal(res, "/User/frank/folder/config-prod.ini");
 	});
 
 
