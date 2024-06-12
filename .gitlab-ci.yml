@@ -75,6 +75,6 @@ publish_open_vsx:
   stage: publish
   script:
     - npx ovsx publish -p $OPENVSX_ACCESS_TOKEN
-  when: manual
-  only:
-    - tags
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+\-release/'
+
