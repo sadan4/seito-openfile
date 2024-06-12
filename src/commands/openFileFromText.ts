@@ -595,11 +595,26 @@ export class OpenFileFromText {
   public resolveEnvironmentVariableInPath(inputPath: string): string {
     let newPath = inputPath;
     // find environment variable
-    const matches = newPath.matchAll(/(\$|\$\{|%)([a-z0-9_]+)([%}]?)/gi);
+    // const matches = newPath.matchAll(/(\$|\$\{|%)([a-z0-9_]+)([%}]?)/gi);
+    const matches = newPath.matchAll(/(\$([a-z0-9_]+)|\${([a-z0-9_]+)\}|%([a-z0-9_]+)%)/gi);
     for (const match of matches) {
-      const m = process.env[match[2]];
-      if (m !== undefined) {
-        newPath = newPath.replace(`${match[1]}${match[2]}${match[3]}`, m);
+      // match string
+      let envVarName;
+      // three possible matching groups
+      let i=3;
+      while(i>0) {
+        if( envVarName === undefined ) {
+          envVarName = match[5-i];
+          i--;
+        } else {
+          break;
+        }
+      }
+      if( envVarName !== undefined ) {
+        const m = process.env[envVarName];
+        if (m !== undefined) {
+          newPath = newPath.replace(`${match[1]}`, m);
+       }
       }
     }
     return newPath;

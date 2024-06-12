@@ -1,10 +1,13 @@
 ## Release Notes
 
+### 2.2.1
+- fixed environment variable detection
+
 ### 2.2.0
 - You can now open a folder with the default file manager, if the string is a folder path
 
 ### 2.1.0
-- Extended environment variable detection to windows compative syntax, i.e. %var%
+- Extended environment variable detection to windows compatible syntax, i.e. %var%
 
 ### 2.0.1
 - Internal code management

@@ -22,7 +22,7 @@
 			"name": "Extension Tests",
 			"type": "extensionHost",
 			"request": "launch",
-			"env": {"WS_ROOT": "${workspaceRoot}", "MY_VAR": "l:\\Datas"},
+			"env": {"WS_ROOT": "${workspaceRoot}", "MY_VAR": "l:\\Datas", "MY_VAR2": "Unicode", "HOME": "/User/frank", "ENV": "prod"},
 			"args": [
 				"${workspaceRoot}/Unittests-tmp",
 				"--extensionDevelopmentPath=${workspaceFolder}",
