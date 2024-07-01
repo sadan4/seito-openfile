@@ -3,7 +3,7 @@
   "displayName": "Open file",
   "description": "Extract a filepath from the current cursor position and open the file",
   "version": "2.2.1",
-  "publisher": "Fr43nks",
+  "publisher": "Fr43nk",
   "engines": {
     "vscode": "^1.70.0"
   },
