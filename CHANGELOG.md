@@ -1,5 +1,8 @@
 ## Release Notes
 
+### 2.2.2
+- fixed some namespace trouble in open-vsx
+
 ### 2.2.1
 - fixed environment variable detection
 
