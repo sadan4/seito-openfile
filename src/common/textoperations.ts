@@ -1,5 +1,5 @@
 import { type Position, type Selection } from "vscode";
-import { ConfigHandler } from "../configuration/confighandler";
+import FileProps from "../types/fileprops.type";
 
 export class TextOperations {
   /** @deprecated.  Now can use document.lineAt() in OpenFileFromText#getWordRanges. */
@@ -38,8 +38,8 @@ export class TextOperations {
     return "";
   }
 
-  public static getPathAndPosition(iWord: string): any {
-    const fileAndLine = {
+  public static getPathAndPosition(iWord: string): FileProps {
+    const fileAndLine: FileProps = {
       file: iWord,
       line: -1,
       column: -1,
@@ -49,8 +49,7 @@ export class TextOperations {
     if (lPos > -1) {
       const numberAfterLastColon = parseInt(iWord.substring(lPos + 1)); // use original parseInt, may not accurate and thus only limit start with number after colon
       if (isNaN(numberAfterLastColon)) {
-        fileAndLine.file =
-          iWord.length === lPos + 1 ? iWord.substring(0, lPos) : iWord;
+        fileAndLine.file = iWord.length === lPos + 1 ? iWord.substring(0, lPos) : iWord;
         fileAndLine.line = fileAndLine.column = -1;
       } else {
         let b4Num = lPos - 1;
@@ -74,17 +73,9 @@ export class TextOperations {
     return fileAndLine;
   }
 
-  public static getWordBetweenBounds(
-    iText: string,
-    iPos: Position,
-    iBounds?: RegExp
-  ): string {
-    let bounds: RegExp = ConfigHandler.Instance.Configuration.Bound;
+  public static getWordBetweenBounds(iText: string, iPos: Position, iBounds: RegExp): string {
     if (iText === undefined || iText === "") {
       return "";
-    }
-    if (iBounds !== undefined) {
-      bounds = iBounds;
     }
     const end = iText.length;
     let i = iPos.character;
@@ -96,14 +87,14 @@ export class TextOperations {
     i--; // Fix: allow cursor touching the right-edge of the target path to work properly
     for (; i >= 0; i--) {
       const t = iText[i];
-      if (t.match(bounds) !== null) {
+      if (t.match(iBounds) !== null) {
         break;
       }
     }
     i++;
     for (; j < end; j++) {
       const t = iText[j];
-      if (t.match(bounds) !== null) {
+      if (t.match(iBounds) !== null) {
         break;
       }
       if (t === ":") {
@@ -113,20 +104,12 @@ export class TextOperations {
           if (lineColMatches[1] === undefined) {
             // doesn't have column number before yet, so read any valid ":<column>" pattern at this colon
             let iSkipNum = j + 1;
-            while (
-              iSkipNum < end &&
-              iText[iSkipNum] >= "0" &&
-              iText[iSkipNum] <= "9"
-            ) {
+            while (iSkipNum < end && iText[iSkipNum] >= "0" && iText[iSkipNum] <= "9") {
               iSkipNum++;
             }
             if (iSkipNum > j + 1) {
               // i.e. is ":<number>" at j
-              if (
-                iSkipNum === end ||
-                iText[iSkipNum] === ":" ||
-                iText[iSkipNum].match(bounds) !== null
-              ) {
+              if (iSkipNum === end || iText[iSkipNum] === ":" || iText[iSkipNum].match(iBounds) !== null) {
                 // at j, accept the column number if it's either :col or :col:... or :col<path-delimiter>
                 j = iSkipNum;
               }
@@ -139,17 +122,11 @@ export class TextOperations {
     return iText.substring(i, j);
   }
 
-  public static getWordOfSelection(
-    iText: string,
-    iSelection: Selection
-  ): string {
+  public static getWordOfSelection(iText: string, iSelection: Selection): string {
     if (iText === undefined || iText === "") {
       return "";
     }
-    return iText.substring(
-      iSelection.start.character,
-      iSelection.end.character
-    );
+    return iText.substring(iSelection.start.character, iSelection.end.character);
   }
 
   public static fixedCharCodeAt(str: string, idx: number): number | boolean {
@@ -166,9 +143,7 @@ export class TextOperations {
       hi = code;
       low = str.charCodeAt(idx + 1);
       if (isNaN(low)) {
-        throw new Error(
-          "High surrogate not followed by low surrogate in fixedCharCodeAt()"
-        );
+        throw new Error("High surrogate not followed by low surrogate in fixedCharCodeAt()");
       }
       return (hi - 0xd800) * 0x400 + (low - 0xdc00) + 0x10000;
     }

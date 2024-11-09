@@ -1,86 +1,90 @@
-"use strict";
+import { Event, EventEmitter, workspace, WorkspaceConfiguration } from "vscode";
+import { Configuration, ConfigurationProperty } from "./configuration";
+import { Suffix } from "../types/suffix.type";
+import { IDisposable } from "../model";
 
-import * as vscode from "vscode";
-import { Configuration } from "./configuration";
+export class ConfigHandler implements IDisposable {
+  private mConfigChanged = new EventEmitter<string[]>();
+  private mConfiguration = new Configuration();
+  private mChangeIdents: string[] = [];
+  private mDisposables: IDisposable[] = [];
 
-export class ConfigHandler {
-  private static m_instance: ConfigHandler;
-  private readonly m_configuration: Configuration;
-
-  public constructor(shouldFollowVsCodeSettings: boolean = true) {
-    this.m_configuration = new Configuration();
-    if (shouldFollowVsCodeSettings) {
-      this.onConfigChanged();
-      vscode.workspace.onDidChangeConfiguration(this.onConfigChanged, this);
-    }
+  constructor() {
+    this.mDisposables.push(workspace.onDidChangeConfiguration(() => this.handleChangedConfig()));
+    this.handleChangedConfig();
   }
 
-  // for unit test not to be affected by current user's settings
-  static preInitInstanceNotFollowingVsCodeSettings(): void {
-    // if (this.m_instance)
-    // 	return;
-    this.m_instance = new this(false);
+  dispose(): void {
+    this.mDisposables.forEach((d) => d.dispose());
   }
 
-  static get Instance(): ConfigHandler {
-    return this.m_instance ?? (this.m_instance = new this());
+  get OnDidChangeConfiguration(): Event<string[]> {
+    return this.mConfigChanged.event;
   }
 
   get Configuration(): Configuration {
-    return this.m_configuration;
+    return this.mConfiguration;
   }
 
-  private onConfigChanged(): void {
-    const config = vscode.workspace.getConfiguration("seito-openfile");
-    if (config !== undefined) {
-      if (config.has("wordbound")) {
-        const r = new RegExp(config.get("wordbound") as string);
-        this.m_configuration.Bound = r;
-      }
-      if (config.has("extensions")) {
-        this.m_configuration.Extensions = config.get("extensions") as string[];
-      }
-      if (config.has("extraExtensionsForTypes")) {
-        this.m_configuration.ExtraExtensionsForTypes = config.get(
-          "extraExtensionsForTypes"
-        ) as object;
-      }
-      if (config.has("searchSubFoldersOfWorkspaceFolders")) {
-        this.m_configuration.SearchSubFoldersOfWorkspaceFolders = config.get(
-          "searchSubFoldersOfWorkspaceFolders"
-        ) as string[];
-      }
-      if (config.has("searchPaths")) {
-        this.m_configuration.SearchPaths = config.get(
-          "searchPaths"
-        ) as string[];
-      }
-      if (config.has("lookupTildePathAlsoFromWorkspace")) {
-        this.m_configuration.LookupTildePathAlsoFromWorkspace = config.get(
-          "lookupTildePathAlsoFromWorkspace"
-        ) as boolean;
-      }
-      if (config.has("leadingPathMapping")) {
-        this.m_configuration.LeadingPathMapping = config.get(
-          "leadingPathMapping"
-        ) as Record<string,string>;
-      }
-      if (config.has("notFoundTriggerQuickOpen")) {
-        this.m_configuration.NotFoundTriggerQuickOpen = config.get(
-          "notFoundTriggerQuickOpen"
-        ) as boolean;
-      }
-      if (config.has("openNewTab")) {
-        this.m_configuration.OpenNewTab = config.get("openNewTab") as boolean;
-      }
-      if (config.has("preferOpenFile")) {
-        this.m_configuration.PreferOpenFile = config.get("preferOpenFile") as boolean;
-      }
-      if (config.has("defaultLinuxOpenCommand")) {
-        this.m_configuration.DefaultLinuxOpenCommand = config.get(
-          "defaultLinuxOpenCommand"
-        ) as string;
+  private loadConfig(): boolean {
+    const config = workspace.getConfiguration("seito-openfile");
+    if (config) {
+      this.mChangeIdents = [];
+      this.setChangeConfigDate<RegExp>(config, "wordbound", this.mConfiguration.Bound);
+      this.setChangeConfigDate<string[]>(config, "extensions", this.mConfiguration.Extensions);
+      this.setChangeConfigDate<Suffix[]>(
+        config,
+        "extraExtensionsForTypes",
+        this.mConfiguration.ExtraExtensionsForTypes
+      );
+      this.setChangeConfigDate<string[]>(
+        config,
+        "searchSubFoldersOfWorkspaceFolders",
+        this.mConfiguration.SearchSubFoldersOfWorkspaceFolders
+      );
+      this.setChangeConfigDate<string[]>(config, "searchPaths", this.mConfiguration.SearchPaths);
+      this.setChangeConfigDate<boolean>(
+        config,
+        "lookupTildePathAlsoFromWorkspace",
+        this.mConfiguration.LookupTildePathAlsoFromWorkspace
+      );
+      this.setChangeConfigDate<Record<string, string>>(
+        config,
+        "leadingPathMapping",
+        this.mConfiguration.LeadingPathMapping
+      );
+      this.setChangeConfigDate<boolean>(
+        config,
+        "notFoundTriggerQuickOpen",
+        this.mConfiguration.NotFoundTriggerQuickOpen
+      );
+      this.setChangeConfigDate<boolean>(config, "openNewTab", this.mConfiguration.OpenNewTab);
+      this.setChangeConfigDate<boolean>(config, "preferOpenFile", this.mConfiguration.PreferOpenFile);
+      this.setChangeConfigDate<string>(config, "defaultLinuxOpenCommand", this.mConfiguration.DefaultLinuxOpenCmd);
+      return true;
+    }
+    return false;
+  }
+
+  private handleChangedConfig(): void {
+    if (this.loadConfig()) {
+      this.mConfigChanged.fire(this.mChangeIdents);
+    }
+  }
+
+  private setChangeConfigDate<T>(
+    config: WorkspaceConfiguration,
+    descriptor: string,
+    configValue: ConfigurationProperty<T>
+  ): boolean {
+    if (config.has(descriptor)) {
+      configValue.Value = config.get(descriptor) as T;
+      if (configValue.Changed) {
+        configValue.Changed = true;
+        this.mChangeIdents.push(descriptor);
+        return true;
       }
     }
+    return false;
   }
 }

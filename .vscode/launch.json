@@ -11,7 +11,8 @@
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
 			"args": [
-				"--extensionDevelopmentPath=${workspaceFolder}"
+				"--extensionDevelopmentPath=${workspaceFolder}",
+				"--disable-extensions"
 			],
 			"outFiles": [
 				"${workspaceFolder}/dist/**/*.js"
@@ -22,7 +23,7 @@
 			"name": "Extension Tests",
 			"type": "extensionHost",
 			"request": "launch",
-			"env": {"WS_ROOT": "${workspaceRoot}", "MY_VAR": "l:\\Datas", "MY_VAR2": "Unicode", "HOME": "/User/frank", "ENV": "prod"},
+			"env": {"WS_ROOT": "${workspaceFolder}", "MY_VAR": "l:\\Datas", "MY_VAR2": "Unicode", "HOME": "/User/frank", "ENV": "prod"},
 			"args": [
 				"${workspaceRoot}/Unittests-tmp",
 				"--extensionDevelopmentPath=${workspaceFolder}",

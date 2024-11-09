@@ -1,142 +1,118 @@
-import { type Suffix } from "../types/suffix.type";
+import { Suffix } from "../types/suffix.type";
+
+export class Variables {
+  static parse<T>(value: T): T {
+    if (value === null || value === "" || typeof value !== "string") {
+      return value;
+    }
+
+    if (typeof value === "string") {
+      const idx = value.indexOf("env:");
+      let retVal = value as string;
+      if (idx > 0) {
+        const matches = value.matchAll(/\$\{env:(\w+)\}/gi);
+        for (const subgrp of matches) {
+          if (subgrp.length > 0) {
+            if (subgrp[1] in process.env) {
+              const v = process.env[subgrp[1]];
+              if (v !== undefined) {
+                retVal = retVal.replace(subgrp[0], v);
+              }
+            }
+          }
+        }
+      }
+      return retVal as T;
+    }
+    return value;
+  }
+}
+
+export class ConfigurationProperty<T> {
+  private mChanged: boolean;
+  private mProp: T;
+
+  constructor(prop: T) {
+    this.mChanged = true;
+    this.mProp = Variables.parse<T>(prop);
+  }
+
+  get Value(): T {
+    return this.mProp;
+  }
+
+  set Value(value: T) {
+    if (this.mProp !== value) {
+      this.mProp = Variables.parse<T>(value);
+      this.mChanged = true;
+    }
+  }
+
+  get Changed(): boolean {
+    const old = this.mChanged;
+    this.mChanged = false;
+    return old;
+  }
+
+  set Changed(state: boolean) {
+    this.mChanged = state;
+  }
+}
 
 export class Configuration {
-  private m_bound: RegExp;
-  private m_extensions: string[];
-  private m_extraExtensionsForTypes: Suffix[];
-  private m_searchSubFoldersOfWorkspaceFolders: string[];
-  private m_searchPaths: string[];
-  private m_lookupTildePathAlsoFromWorkspace: boolean;
-  private m_leadingPathMapping: Record<string, string>;
-  private m_notFoundTriggerQuickOpen: boolean;
-  private m_openNewTab: boolean;
-  private m_preferOpenFile: boolean;
-  private m_defaultLinuxOpenCmd: string;
+  private mBound = new ConfigurationProperty<RegExp>(/[\s\\"\\'\\>\\<#;]/);
+  private mExtensions = new ConfigurationProperty<string[]>([]);
+  private mExtraExtensionsForTypes = new ConfigurationProperty<Suffix[]>([]);
+  private mSearchSubFoldersOfWorkspaceFolders = new ConfigurationProperty<string[]>([]);
+  private mSearchPaths = new ConfigurationProperty<string[]>([]);
+  private mLookupTildePathAlsoFromWorkspace = new ConfigurationProperty<boolean>(true);
+  private mLeadingPathMapping = new ConfigurationProperty<Record<string, string>>({});
+  private mNotFoundTriggerQuickOpen = new ConfigurationProperty<boolean>(true);
+  private mOpenNewTab = new ConfigurationProperty<boolean>(false);
+  private mPreferOpenFile = new ConfigurationProperty<boolean>(true);
+  private mDefaultLinuxOpenCmd = new ConfigurationProperty<string>("xdg-open");
 
-  public constructor() {
-    this.m_bound = /[\s\\"\\'\\>\\<#;]/;
-    this.m_extensions = new Array<string>();
-    this.m_extraExtensionsForTypes = [];
-    this.m_searchSubFoldersOfWorkspaceFolders = new Array<string>();
-    this.m_searchPaths = new Array<string>();
-    this.m_lookupTildePathAlsoFromWorkspace = true;
-    this.m_leadingPathMapping = {};
-    this.m_notFoundTriggerQuickOpen = true;
-    this.m_openNewTab = false;
-    this.m_preferOpenFile = true;
-    this.m_defaultLinuxOpenCmd = "xdg-open";
+  get Bound(): ConfigurationProperty<RegExp> {
+    return this.mBound;
   }
 
-  get Bound(): RegExp {
-    return this.m_bound;
+  get Extensions(): ConfigurationProperty<string[]> {
+    return this.mExtensions;
   }
 
-  set Bound(iReg: RegExp) {
-    if (iReg !== undefined) {
-      this.m_bound = iReg;
-    }
+  get ExtraExtensionsForTypes(): ConfigurationProperty<Suffix[]> {
+    return this.mExtraExtensionsForTypes;
   }
 
-  // eslint-disable-next-line accessor-pairs
-  set BoundFromString(iReg: string) {
-    if (iReg !== undefined) {
-      this.m_bound = new RegExp(iReg);
-    }
+  get SearchSubFoldersOfWorkspaceFolders(): ConfigurationProperty<string[]> {
+    return this.mSearchSubFoldersOfWorkspaceFolders;
   }
 
-  set Extensions(iSufx: string[]) {
-    if (iSufx !== undefined) {
-      this.m_extensions = iSufx;
-    }
+  get SearchPaths(): ConfigurationProperty<string[]> {
+    return this.mSearchPaths;
   }
 
-  get Extensions(): string[] {
-    return this.m_extensions;
+  get LookupTildePathAlsoFromWorkspace(): ConfigurationProperty<boolean> {
+    return this.mLookupTildePathAlsoFromWorkspace;
   }
 
-  set ExtraExtensionsForTypes(map: object) {
-    this.m_extraExtensionsForTypes = map as Suffix[];
+  get LeadingPathMapping(): ConfigurationProperty<Record<string, string>> {
+    return this.mLeadingPathMapping;
   }
 
-  get ExtraExtensionsForTypes(): object {
-    return this.m_extraExtensionsForTypes;
+  get NotFoundTriggerQuickOpen(): ConfigurationProperty<boolean> {
+    return this.mNotFoundTriggerQuickOpen;
   }
 
-  set SearchSubFoldersOfWorkspaceFolders(iPatterns: string[]) {
-    if (iPatterns !== undefined) {
-      this.m_searchSubFoldersOfWorkspaceFolders = iPatterns;
-    }
+  get OpenNewTab(): ConfigurationProperty<boolean> {
+    return this.mOpenNewTab;
   }
 
-  get SearchSubFoldersOfWorkspaceFolders(): string[] {
-    return this.m_searchSubFoldersOfWorkspaceFolders;
+  get PreferOpenFile(): ConfigurationProperty<boolean> {
+    return this.mPreferOpenFile;
   }
 
-  set SearchPaths(iPaths: string[]) {
-    if (iPaths !== undefined) {
-      this.m_searchPaths = iPaths;
-    }
-  }
-
-  get SearchPaths(): string[] {
-    return this.m_searchPaths;
-  }
-
-  set LookupTildePathAlsoFromWorkspace(yesNo: boolean) {
-    if (yesNo !== undefined) {
-      this.m_lookupTildePathAlsoFromWorkspace = yesNo;
-    }
-  }
-
-  get LookupTildePathAlsoFromWorkspace(): boolean {
-    return this.m_lookupTildePathAlsoFromWorkspace;
-  }
-
-  set LeadingPathMapping(mappings: Record<string, string>) {
-    if (mappings !== undefined) {
-      this.m_leadingPathMapping = mappings;
-    }
-  }
-
-  get LeadingPathMapping(): Record<string, string> {
-    return this.m_leadingPathMapping;
-  }
-
-  set NotFoundTriggerQuickOpen(yesNo: boolean) {
-    if (yesNo !== undefined) {
-      this.m_notFoundTriggerQuickOpen = yesNo;
-    }
-  }
-
-  get NotFoundTriggerQuickOpen(): boolean {
-    return this.m_notFoundTriggerQuickOpen;
-  }
-
-  set OpenNewTab(yesNo: boolean) {
-    if (yesNo !== undefined) {
-      this.m_openNewTab = yesNo;
-    }
-  }
-
-  get OpenNewTab(): boolean {
-    return this.m_openNewTab;
-  }
-
-  set PreferOpenFile(val: boolean) {
-    this.m_preferOpenFile = val;
-  }
-
-  get PreferOpenFile(): boolean {
-    return this.m_preferOpenFile;
-  }
-
-  set DefaultLinuxOpenCommand(cmd: string) {
-    if (cmd !== undefined && cmd !== "") {
-      this.m_defaultLinuxOpenCmd = cmd;
-    }
-  }
-
-  get DefaultLinuxOpenCommand(): string {
-    return this.m_defaultLinuxOpenCmd;
+  get DefaultLinuxOpenCmd(): ConfigurationProperty<string> {
+    return this.mDefaultLinuxOpenCmd;
   }
 }

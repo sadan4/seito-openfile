@@ -14,10 +14,7 @@ export class OpenFileFromText {
   // private m_currFile: vscode.Uri;
   // Just use this.editor.document.uri.  vscode.TextEditor's document will never be null.
 
-  public constructor(
-    private editor: vscode.TextEditor | undefined,
-    private readonly configHandler: ConfigHandler
-  ) {
+  public constructor(private editor: vscode.TextEditor | undefined, private readonly configHandler: ConfigHandler) {
     /* if (editor &&
             editor.document &&
             editor.document.uri) {
@@ -25,8 +22,8 @@ export class OpenFileFromText {
         } */
   }
 
-  public onChangeEditor(): void {
-    this.editor = vscode.window.activeTextEditor;
+  public onChangeEditor(event: vscode.TextEditor | undefined): void {
+    this.editor = event;
   }
 
   public trimPathSeparator(path: string): string {
@@ -47,8 +44,7 @@ export class OpenFileFromText {
       if (!isOpeningMultipleFiles && words.length > 1) {
         isOpeningMultipleFiles = true;
       }
-      const openForceNewTab =
-        isOpeningMultipleFiles || this.configHandler.Configuration.OpenNewTab;
+      const openForceNewTab = isOpeningMultipleFiles || this.configHandler.Configuration.OpenNewTab.Value;
       for (const word of words) {
         this.openDocument(word, openForceNewTab)
           .then((path) => {
@@ -56,10 +52,7 @@ export class OpenFileFromText {
           })
           .catch((error) => {
             console.log("Execute command", word + ":", error);
-            if (
-              !isOpeningMultipleFiles &&
-              this.configHandler.Configuration.NotFoundTriggerQuickOpen
-            ) {
+            if (!isOpeningMultipleFiles && this.configHandler.Configuration.NotFoundTriggerQuickOpen) {
               // Note it is safe below to cut prefix '/' to make the absolute path relative, because if it is an absolute path and file exists, it should have opened directly.
               const newWord = this.rewritePathWithLeadingPathMapping(
                 word.replace(/\\/g, "/"),
@@ -97,19 +90,15 @@ export class OpenFileFromText {
 
   // Input: [ [1, 2, 3], [101, 2, 1, 10], [2, 1] ]
   // Output: [1, 2, 3, 101, 10]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public mergeDeduplicate(...valuesArrays: any[]): any[] {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return [...new Set([].concat(...valuesArrays))];
   }
 
-  public rewritePathWithLeadingPathMapping(
-    inputPath: string,
-    isSlashAbsolutePath: boolean
-  ): string | null {
-    const tempInputPathWithoutLeadingSlash = isSlashAbsolutePath
-      ? inputPath.substr(1)
-      : inputPath; // for temporary match with leadingPaths only
-    const leadingPathMapping =
-      this.configHandler.Configuration.LeadingPathMapping;
+  public rewritePathWithLeadingPathMapping(inputPath: string, isSlashAbsolutePath: boolean): string | null {
+    const tempInputPathWithoutLeadingSlash = isSlashAbsolutePath ? inputPath.substring(1) : inputPath; // for temporary match with leadingPaths only
+    const leadingPathMapping = this.configHandler.Configuration.LeadingPathMapping.Value;
     const leadingPaths = Object.keys(leadingPathMapping);
     let i = leadingPaths.length;
     for (; i-- > 0; ) {
@@ -117,9 +106,7 @@ export class OpenFileFromText {
       const leadingPath = leadingPaths[i].replace(/\*\?$/, "*"); // allow leadingPathMapping = { "$*": "*", "$*?": "" } to work.  Since a key "$*" cannot appear twice.
       const isEndWithStar = leadingPath.endsWith("*");
       const isPrefix = tempInputPathWithoutLeadingSlash.startsWith(
-        isEndWithStar
-          ? leadingPath.substr(0, leadingPath.length - 1)
-          : leadingPath
+        isEndWithStar ? leadingPath.substr(0, leadingPath.length - 1) : leadingPath
       );
       let isMatchedLeadingPath = false;
       let lengthOfMatch = leadingPath.length;
@@ -129,16 +116,10 @@ export class OpenFileFromText {
           isMatchedLeadingPath = true;
           lengthOfMatch -= 1; // decrement for the tailing '*'
           let i = lengthOfMatch;
-          while (
-            i < tempInputPathWithoutLeadingSlash.length &&
-            tempInputPathWithoutLeadingSlash[i] !== "/"
-          ) {
+          while (i < tempInputPathWithoutLeadingSlash.length && tempInputPathWithoutLeadingSlash[i] !== "/") {
             ++i;
           }
-          stringStarExpandTo = tempInputPathWithoutLeadingSlash.substr(
-            lengthOfMatch,
-            i - lengthOfMatch
-          );
+          stringStarExpandTo = tempInputPathWithoutLeadingSlash.substring(lengthOfMatch, i - lengthOfMatch);
           lengthOfMatch = i;
         } else {
           isMatchedLeadingPath =
@@ -147,18 +128,15 @@ export class OpenFileFromText {
         }
       }
       if (isMatchedLeadingPath) {
-        let mappedPath = this.trimPathSeparator(
-          leadingPathMapping[leadingPaths[i]]
-        );
-        let remainPath = tempInputPathWithoutLeadingSlash.substr(lengthOfMatch); // cut the match to leadingPath
+        let mappedPath = this.trimPathSeparator(leadingPathMapping[leadingPaths[i]]);
+        let remainPath = tempInputPathWithoutLeadingSlash.substring(lengthOfMatch); // cut the match to leadingPath
         if (mappedPath === "") {
           // delete folder levels
           remainPath = this.trimPathSeparator(remainPath);
         } else if (isEndWithStar) {
           mappedPath = mappedPath.replace("*", stringStarExpandTo); // expand a '*' if it exists.
         }
-        const newPath =
-          (isSlashAbsolutePath ? "/" : "") + mappedPath + remainPath; // remainPath must either be empty or start with '/', as checked above
+        const newPath = (isSlashAbsolutePath ? "/" : "") + mappedPath + remainPath; // remainPath must either be empty or start with '/', as checked above
         if (newPath !== "") {
           return newPath; // improvement: if whole path is translated to empty string (may be deletion), such as "$variable" for leadingPathMapping = { "$*": "" }, it is better not accepted for this case to translated.  But continue the search.
         }
@@ -179,8 +157,7 @@ export class OpenFileFromText {
     if (iCurrentDocFileName !== undefined) {
       currentDocUri = vscode.Uri.file(iCurrentDocFileName);
     }
-    const currentDocFileName =
-      currentDocUri !== undefined ? currentDocUri.fsPath : "";
+    const currentDocFileName = currentDocUri !== undefined ? currentDocUri.fsPath : "";
     let basePath = dirname(currentDocFileName);
 
     // Normalize \ to / in the file string (\ not work for existsSync on linux-like), to support e.g. "use namespace\Class;" with path path/to/class/namespace/Class.php in PHP.
@@ -189,29 +166,18 @@ export class OpenFileFromText {
     // inputPath = inputPath.replace(/[\s]+/g, "\\ ");
 
     const isAbsolutePath = isAbsolute(inputPath);
-    const isSlashAbsolutePath =
-      isAbsolutePath && inputPath.match(/^[/\\][^/\\]/) !== null;
+    const isSlashAbsolutePath = isAbsolutePath && inputPath.match(/^[/\\][^/\\]/) !== null;
 
     // translate path inputPath with "leadingPathMapping"
-    const newPath = this.rewritePathWithLeadingPathMapping(
-      inputPath,
-      isSlashAbsolutePath
-    );
+    const newPath = this.rewritePathWithLeadingPathMapping(inputPath, isSlashAbsolutePath);
     if (newPath !== null) {
       inputPath = newPath;
     }
 
     // First, try relative to current document's folder, or absolute path, or relative to "~"
-    let p = FileOperations.getAbsoluteFromRelativePath(
-      inputPath,
-      basePath,
-      true
-    );
+    let p = FileOperations.getAbsoluteFromRelativePath(inputPath, basePath, true);
     const prefOpenFile = this.configHandler.Configuration.PreferOpenFile;
-    if (
-      existsSync(p) &&
-      (lstatSync(p).isFile() || (!prefOpenFile && lstatSync(p).isDirectory()))
-    ) {
+    if (existsSync(p) && (lstatSync(p).isFile() || (!prefOpenFile && lstatSync(p).isDirectory()))) {
       return p;
     }
     try {
@@ -219,20 +185,16 @@ export class OpenFileFromText {
       if (lstatSync(p).isSymbolicLink()) {
         return p;
       }
-    } catch (e) {}
+    } catch {
+      p = "";
+    }
 
-    const isHomePath = inputPath[0] === "~";
+    const isHomePath = inputPath.startsWith("~");
     let tryWorkspaceHomePath = false;
-    if (
-      isHomePath &&
-      this.configHandler.Configuration.LookupTildePathAlsoFromWorkspace
-    ) {
+    if (isHomePath && this.configHandler.Configuration.LookupTildePathAlsoFromWorkspace) {
       tryWorkspaceHomePath = true;
     }
-    if (
-      (isHomePath && !tryWorkspaceHomePath) ||
-      (isAbsolutePath && !isSlashAbsolutePath)
-    ) {
+    if ((isHomePath && !tryWorkspaceHomePath) || (isAbsolutePath && !isSlashAbsolutePath)) {
       // only relative path (or absolute path start with single slash/backslash, not C: drive) can continue to lookup from other folders
       return "";
     }
@@ -248,12 +210,9 @@ export class OpenFileFromText {
     let extensions = [assumeExtWithoutDot];
     if (assumeExt !== "") {
       // lookup path has no extension
-      const extensionsMap: Suffix[] = this.configHandler.Configuration
-        .ExtraExtensionsForTypes as Suffix[];
+      const extensionsMap: Suffix[] = this.configHandler.Configuration.ExtraExtensionsForTypes.Value;
       let extraExtensions: string[] = [];
-      const suffix = extensionsMap.find(
-        (va: Suffix) => va.name === assumeExtWithoutDot
-      );
+      const suffix = extensionsMap.find((va: Suffix) => va.name === assumeExtWithoutDot);
       if (suffix !== undefined) {
         extraExtensions = [...suffix.suffixes];
       }
@@ -269,8 +228,7 @@ export class OpenFileFromText {
     let currentWorkspaceFolderObj: vscode.WorkspaceFolder | undefined;
     let currentWorkspaceFolder = null;
     if (currentDocUri !== undefined && currentDocUri.scheme === "file") {
-      currentWorkspaceFolderObj =
-        vscode.workspace.getWorkspaceFolder(currentDocUri);
+      currentWorkspaceFolderObj = vscode.workspace.getWorkspaceFolder(currentDocUri);
       if (currentWorkspaceFolderObj !== undefined) {
         isWithinAWorkspaceFolder = true;
         currentWorkspaceFolder = currentWorkspaceFolderObj.uri.fsPath;
@@ -278,12 +236,7 @@ export class OpenFileFromText {
     }
     // Try fuzzy for single leading slash/backslash absolute path
     if (isAbsolutePath || tryWorkspaceHomePath) {
-      p = this.getAbsolutePathFromFuzzyPathWithMultipleExtensions(
-        inputPath,
-        basePath,
-        extensions,
-        true
-      );
+      p = this.getAbsolutePathFromFuzzyPathWithMultipleExtensions(inputPath, basePath, extensions, true);
       if (p !== "") {
         return p;
       }
@@ -301,26 +254,17 @@ export class OpenFileFromText {
     // Lookup from current document's folder up to its corresponding workspace folder (if none match, just search current document's folder fuzzily)
     if (!tryWorkspaceHomePath) {
       while (true) {
-        p = this.getAbsolutePathFromFuzzyPathWithMultipleExtensions(
-          inputPath,
-          basePath,
-          extensions,
-          true
-        );
+        p = this.getAbsolutePathFromFuzzyPathWithMultipleExtensions(inputPath, basePath, extensions, true);
         if (p !== "") {
           return p;
         } else {
           // no file found, path exists within the workspace, so open it
-          const _p = join(basePath,inputPath);
-          if( existsSync(_p) && lstatSync(_p).isDirectory() ) {
+          const _p = join(basePath, inputPath);
+          if (existsSync(_p) && lstatSync(_p).isDirectory()) {
             return _p;
           }
         }
-        if (
-          finalConditionRe.test(basePath) ||
-          !isWithinAWorkspaceFolder ||
-          join(basePath) === currentWorkspaceFolder
-        ) {
+        if (finalConditionRe.test(basePath) || !isWithinAWorkspaceFolder || join(basePath) === currentWorkspaceFolder) {
           // break at workspace folder, or root path of system (finalConditionRe)
           break;
         }
@@ -333,28 +277,17 @@ export class OpenFileFromText {
     if (isWithinAWorkspaceFolder && currentWorkspaceFolderObj !== undefined) {
       workspaceFolders.push(currentWorkspaceFolderObj);
     }
-    workspaceFolders = this.mergeDeduplicate(
-      workspaceFolders,
-      vscode.workspace.workspaceFolders ?? []
-    );
+    workspaceFolders = this.mergeDeduplicate(workspaceFolders, vscode.workspace.workspaceFolders ?? []);
     for (const workspaceFolderObj of workspaceFolders) {
       const workspaceFolder = workspaceFolderObj.uri.fsPath;
 
       // Search a workspace folder
       if (workspaceFolder !== currentWorkspaceFolder || tryWorkspaceHomePath) {
-        let p = FileOperations.getAbsoluteFromAlwaysRelativePath(
-          inputPath,
-          join(workspaceFolder),
-          true
-        );
+        let p = FileOperations.getAbsoluteFromAlwaysRelativePath(inputPath, join(workspaceFolder), true);
         if (existsSync(p)) {
           return p;
         } else {
-          p = FileOperations.getAbsoluteFromAlwaysRelativePath(
-            inputPath + assumeExt,
-            join(workspaceFolder),
-            true
-          );
+          p = FileOperations.getAbsoluteFromAlwaysRelativePath(inputPath + assumeExt, join(workspaceFolder), true);
           if (existsSync(p)) {
             return p;
           }
@@ -363,18 +296,13 @@ export class OpenFileFromText {
 
       // Search some subfolders under the workspace folder
       // let workspaceSubFolders = ["lib", "src", "app", "class", "module", "inc", "vendor", "public"]; // "class*", "module*", "inc*"
-      const subFoldersPattern =
-        this.configHandler.Configuration.SearchSubFoldersOfWorkspaceFolders;
+      const subFoldersPattern = this.configHandler.Configuration.SearchSubFoldersOfWorkspaceFolders.Value;
       const workspaceSubFolders = globSync(subFoldersPattern, {
         cwd: workspaceFolder,
       });
 
       for (const folder of workspaceSubFolders) {
-        let p = FileOperations.getAbsoluteFromAlwaysRelativePath(
-          inputPath,
-          join(workspaceFolder, folder),
-          true
-        );
+        let p = FileOperations.getAbsoluteFromAlwaysRelativePath(inputPath, join(workspaceFolder, folder), true);
         if (existsSync(p)) {
           return p;
         } else {
@@ -391,23 +319,13 @@ export class OpenFileFromText {
     }
 
     // Addition search paths
-    const searchPaths = tryWorkspaceHomePath
-      ? []
-      : this.configHandler.Configuration.SearchPaths;
+    const searchPaths = tryWorkspaceHomePath ? [] : this.configHandler.Configuration.SearchPaths.Value;
     for (const folder of searchPaths) {
-      const p = FileOperations.getAbsoluteFromAlwaysRelativePath(
-        inputPath,
-        join(folder),
-        true
-      );
+      const p = FileOperations.getAbsoluteFromAlwaysRelativePath(inputPath, join(folder), true);
       if (existsSync(p) && lstatSync(p).isFile()) {
         return p;
       } else {
-        const pNew = FileOperations.getAbsoluteFromAlwaysRelativePath(
-          inputPath + assumeExt,
-          join(folder),
-          true
-        );
+        const pNew = FileOperations.getAbsoluteFromAlwaysRelativePath(inputPath + assumeExt, join(folder), true);
         if (existsSync(pNew) && lstatSync(pNew).isFile()) {
           return pNew;
         }
@@ -419,10 +337,7 @@ export class OpenFileFromText {
     return "";
   }
 
-  public async openDocument(
-    iWord: string,
-    iForceNewTab: boolean = false
-  ): Promise<string> {
+  public async openDocument(iWord: string, iForceNewTab: boolean = false): Promise<string> {
     if (iWord === undefined || iWord === "") {
       throw new Error("Path is empty");
     }
@@ -458,7 +373,7 @@ export class OpenFileFromText {
                 _res =
                   TextOperations.fixedCharCodeAt(_sub, 0) !== false &&
                   TextOperations.fixedCharCodeAt(_sub, 1) === false;
-              } catch (error) {
+              } catch {
                 _res = false;
               }
               if (_res) {
@@ -468,10 +383,7 @@ export class OpenFileFromText {
               }
             }
           }
-          const pos = new vscode.Position(
-            fileAndLine.line - 1,
-            realCharPos > 0 ? realCharPos - 1 : 0
-          );
+          const pos = new vscode.Position(fileAndLine.line - 1, realCharPos > 0 ? realCharPos - 1 : 0);
           targetSelection = new vscode.Selection(pos, pos);
           if (fileAndLine.column < 0) {
             // Optional: this preserve old plug-in's behavior that whole line is selected
@@ -489,19 +401,16 @@ export class OpenFileFromText {
                                 iEditor.revealRange(targetSelection, vscode.TextEditorRevealType.InCenter);
                             } */
             return await Promise.resolve(
-              `${p}:${fileAndLine.line}` +
-                (fileAndLine.column > 0 ? ":" + fileAndLine.column : "")
+              `${p}:${fileAndLine.line}` + (fileAndLine.column > 0 ? ":" + fileAndLine.column : "")
             );
           } else {
             return await Promise.resolve(p);
           }
-        } catch (e: any) {
-          throw new Error(
-            `Something went wrong with showTextDocument: ${e.message}`
-          );
+        } catch (e: unknown) {
+          throw new Error(`Something went wrong with showTextDocument: ${(e as Error).message}`);
         }
-      } catch (e: any) {
-        throw new Error(`Something went wrong with openDocument: ${e.message}`);
+      } catch (e: unknown) {
+        throw new Error(`Something went wrong with openDocument: ${(e as Error).message}`);
       }
     } else {
       throw new Error("File not found");
@@ -531,9 +440,7 @@ export class OpenFileFromText {
           break;
         default:
           p = p.replace(/(\s+)/g, "\\$1");
-          exec(
-            `${this.configHandler.Configuration.DefaultLinuxOpenCommand} ${p}`
-          );
+          exec(`${this.configHandler.Configuration.DefaultLinuxOpenCmd.Value} ${p}`);
       }
     }
   }
@@ -546,12 +453,7 @@ export class OpenFileFromText {
   ): string {
     let p;
     for (const extension of iSuffixes) {
-      p = FileOperations.getAbsolutePathFromFuzzyPath(
-        iPath,
-        iCurrPath,
-        extension,
-        baseMustBeDir
-      );
+      p = FileOperations.getAbsolutePathFromFuzzyPath(iPath, iCurrPath, extension, baseMustBeDir);
       if (p !== "") {
         return p;
       }
@@ -559,10 +461,7 @@ export class OpenFileFromText {
     return "";
   }
 
-  public getWordRanges(
-    selection: vscode.Selection,
-    iDocument?: vscode.TextDocument
-  ): string[] | undefined {
+  public getWordRanges(selection: vscode.Selection, iDocument?: vscode.TextDocument): string[] | undefined {
     let line: string;
     let start: vscode.Position;
     const document = iDocument ?? this.editor?.document;
@@ -573,13 +472,7 @@ export class OpenFileFromText {
     if (selection.isEmpty) {
       line = document.lineAt(selection.active.line).text;
       start = selection.active;
-      return [
-        TextOperations.getWordBetweenBounds(
-          line,
-          start,
-          this.configHandler.Configuration.Bound
-        ),
-      ];
+      return [TextOperations.getWordBetweenBounds(line, start, this.configHandler.Configuration.Bound.Value)];
     } else {
       const multiLinesText = document.getText(selection);
       let lines = multiLinesText.split(/\r\n?|\n/);
@@ -601,20 +494,20 @@ export class OpenFileFromText {
       // match string
       let envVarName;
       // three possible matching groups
-      let i=3;
-      while(i>0) {
-        if( envVarName === undefined ) {
-          envVarName = match[5-i];
+      let i = 3;
+      while (i > 0) {
+        if (envVarName === undefined) {
+          envVarName = match[5 - i];
           i--;
         } else {
           break;
         }
       }
-      if( envVarName !== undefined ) {
+      if (envVarName !== undefined) {
         const m = process.env[envVarName];
         if (m !== undefined) {
           newPath = newPath.replace(`${match[1]}`, m);
-       }
+        }
       }
     }
     return newPath;
@@ -625,7 +518,7 @@ export class OpenFileFromText {
       try {
         const fsStats = statSync(inputPath);
         return fsStats.isDirectory();
-      } catch (error) {
+      } catch {
         return false;
       }
     }
