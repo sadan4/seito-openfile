@@ -6,4 +6,4 @@ Unittests-tmp
 Unittests-common
 .DS_Store
 .vscode-test
-seito-openfile-*-rc.*.vsix
+*.vsix
